@@ -25,6 +25,11 @@ class RolePermissionSeeder extends Seeder
                 'view_books',
                 'manage_books',
                 'return_books',
+                'manage_categories',
+                'view_members',
+                'manage_reservations',
+                'view_fines',
+                'manage_fines',
             ])->pluck('id')
         );
 
@@ -33,6 +38,9 @@ class RolePermissionSeeder extends Seeder
             Permission::whereIn('name', [
                 'view_books',
                 'borrow_books',
+                'view_fines',         // hanya denda sendiri
+                'reserve_books',
+                'access_digital_books',
             ])->pluck('id')
         );
 
