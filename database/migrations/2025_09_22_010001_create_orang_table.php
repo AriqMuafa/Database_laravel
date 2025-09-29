@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateOrangTable extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('orang', function (Blueprint $table) {
