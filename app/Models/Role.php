@@ -1,33 +1,34 @@
 <?php
-
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
-<<<<<<< HEAD
-
-class Role extends Model
-{
-    //
-}
-=======
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-
 class Role extends Model
 {
-    protected $fillable = ['name', 'display_name', 'description'];
-
-    // Satu role bisa dimiliki banyak user
-    public function users(): HasMany
-    {
-        return $this->hasMany(User::class);
-    }
-
-    // Satu role bisa punya banyak permission
-    public function permissions(): BelongsToMany
-    {
-        return $this->belongsToMany(Permission::class, 'role_permission');
-    }
+ protected $fillable = [
+ 'name', 'display_name', 'description', 'is_active'
+ ];
+ protected $casts = [
+ 'is_active' => 'boolean',
+ ];
+ public function users()
+ {
+ return $this->hasMany(User::class);
+ }
+ public function permissions()
+ {
+ return $this->belongsToMany(Permission::class, 'role_permission');
+ }
+ public function hasPermission(string $permission): bool
+ {
+ return $this->permissions()->where('name', $permission)->exists();
+ }
+ public function givePermission(Permission $permission)
+ {
+ return $this->permissions()->attach($permission);
+ }
+ public function removePermission(Permission $permission)
+ {
+ return $this->permissions()->detach($permission);
+ }
 }
-
->>>>>>> 8cd26f588a7adfb1b8ecd670e42282a14a5a82f2

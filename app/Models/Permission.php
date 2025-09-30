@@ -1,26 +1,32 @@
 <?php
-
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Model;
-<<<<<<< HEAD
-
-class Permission extends Model
-{
-    //
-}
-=======
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-
 class Permission extends Model
 {
-    protected $fillable = ['name', 'display_name', 'description'];
-
-    // Satu permission bisa dimiliki banyak role
-    public function roles(): BelongsToMany
-    {
-        return $this->belongsToMany(Role::class, 'role_permission');
-    }
+ protected $fillable = [
+ 'name',
+ 'display_name',
+ 'group',
+ 'description',
+ 'is_active'
+ ];
+ protected $casts = [
+ 'is_active' => 'boolean',
+ ];
+ // Permission belongs to many roles
+ public function roles(): BelongsToMany
+ {
+ return $this->belongsToMany(Role::class, 'role_permission');
+ }
+ // Scope untuk filter berdasarkan group
+ public function scopeByGroup($query, $group)
+ {
+ return $query->where('group', $group);
+ }
+ // Scope untuk permission yang aktif
+ public function scopeActive($query)
+ {
+ return $query->where('is_active', true);
+ }
 }
-
->>>>>>> 8cd26f588a7adfb1b8ecd670e42282a14a5a82f2
