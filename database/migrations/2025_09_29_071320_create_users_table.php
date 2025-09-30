@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
@@ -18,9 +17,10 @@ return new class extends Migration
 
             // langsung tambahkan role_id
             $table->foreignId('role_id')
-                ->default(1) // default bisa guest/anggota
+                ->default(3)
                 ->constrained('roles')
                 ->onDelete('cascade');
+
 
             $table->timestamps();
         });
