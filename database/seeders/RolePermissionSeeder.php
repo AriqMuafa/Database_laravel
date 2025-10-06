@@ -30,6 +30,7 @@ class RolePermissionSeeder extends Seeder
                 'manage_reservations',
                 'view_fines',
                 'manage_fines',
+                'manage_expired_members'
             ])->pluck('id')
         );
 
