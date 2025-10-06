@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Route;
 
 //halaman utama
@@ -46,5 +47,25 @@ Route::middleware(['auth', 'permission:view_reports'])->get('/admin/reports', fn
 
 //guest
 Route::middleware(['auth', 'permission:register_member'])->get('/register-member', fn() => view('guest.register'))->name('register.member');
+
+Route::middleware(['auth', 'permission:manage_roles'])->group(function () {
+    Route::resource('user-roles', RoleController::class);});
+
+Route::get('/menu/buku', function () {
+    return view('menu.buku');
+})->name('menu.buku');
+
+Route::get('/menu/anggota', function () {
+    return view('menu.anggota');
+})->name('menu.anggota');
+
+Route::get('/menu/manajemen', function () {
+    return view('menu.manajemen');
+})->name('menu.manajemen');
+
+Route::get('/menu/laporan', function () {
+    return view('menu.laporan');
+})->name('menu.laporan');
+
 
 require __DIR__.'/auth.php';
