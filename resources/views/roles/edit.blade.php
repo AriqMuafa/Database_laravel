@@ -93,7 +93,7 @@
                                 Cancel
                             </a>
                             <button type="submit"
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                class="bg-blue-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                 Update Role
                             </button>
                         </div>
