@@ -29,6 +29,6 @@ class UserSeeder extends Seeder
             'email' => 'cekkerjaan123@gmail.com',
             'password' => Hash::make('password'), // ✅ default password
             'role_id' => $pustakawanRole->id,
-        ]);
+        ]);   
     }
 }

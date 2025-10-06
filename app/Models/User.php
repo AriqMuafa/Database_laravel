@@ -1,77 +1,63 @@
 <?php
-
 namespace App\Models;
-
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Role;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
-
-    protected $table = 'users';
-
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'phone',
-        'role_id',
-        'orang_id', // relasi ke tabel orang
-    ];
-
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    /**
-     * Relasi: User belongs to one Role
-     */
-    public function role(): BelongsTo
-    {
-        return $this->belongsTo(Role::class);
-    }
-
-    /**
-     * Relasi: User belongs to Orang (data identitas)
-     */
-    public function orang(): BelongsTo
-    {
-        return $this->belongsTo(Orang::class, 'orang_id');
-    }
-
-    /**
-     * Cek apakah user punya permission tertentu
-     */
-    public function hasPermission(string $permission): bool
-    {
-        return $this->role?->permissions()->where('name', $permission)->exists() ?? false;
-    }
-
-    /**
-     * Helper untuk cek role
-     */
-    public function isAdmin(): bool
-    {
-        return $this->role?->name === 'admin';
-    }
-
-    public function isPustakawan(): bool
-    {
-        return $this->role?->name === 'pustakawan';
-    }
-
-    public function isAnggota(): bool
-    {
-        return $this->role?->name === 'anggota';
-    }
+ protected $fillable = [
+ 'name', 'email', 'password', 'phone', 'role_id'
+ ];
+ protected $hidden = [
+ 'password', 'remember_token',
+ ];
+ // User belongs to one role
+ public function role(): BelongsTo
+ {
+ return $this->belongsTo(Role::class);
+ }
+ // Check if user has specific permission
+ public function hasPermission(string $permission): bool
+ {
+ return $this->role?->hasPermission($permission) ?? false;
+ }
+ // Check if user has any of the given permissions
+ public function hasAnyPermission(array $permissions): bool
+ {
+ foreach ($permissions as $permission) {
+ if ($this->hasPermission($permission)) {
+ return true;
+ }
+ }
+ return false;
+ }
+ // Check if user has all given permissions
+ public function hasAllPermissions(array $permissions): bool
+ {
+ foreach ($permissions as $permission) {
+ if (!$this->hasPermission($permission)) {
+ return false;
+ }
+ }
+ return true;
+ }
+ // Get user's role name
+ public function getRoleName(): string
+ {
+ return $this->role?->name ?? 'No Role';
+ }
+ // Helper methods for role checking
+ public function isAdmin(): bool
+ {
+ return $this->getRoleName() === 'admin';
+ }
+ public function isOfficer(): bool
+ {
+ return $this->getRoleName() === 'officer';
+ }
+ public function isCustomer(): bool
+ {
+ return $this->getRoleName() === 'customer';
+ }
 }

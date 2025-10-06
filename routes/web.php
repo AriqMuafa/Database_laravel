@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\RoleController;
@@ -19,6 +20,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::resource('users', App\Http\Controllers\UserController::class);
+
+Route::prefix('admin')->middleware(['auth', 'permission:manage_users'])->group(function () {
+    Route::resource('users', UserController::class);
+});
+
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    Route::resource('users', UserController::class);
+});
+
+
 //buku
 Route::middleware(['auth', 'permission:view_books'])->get('/books', [BookController::class, 'index'])->name('books.index');
 Route::middleware(['auth', 'permission:borrow_books'])->get('/borrow', fn() => view('books.borrow'))->name('books.borrow');
@@ -28,7 +40,6 @@ Route::middleware(['auth', 'permission:manage_categories'])->get('/categories', 
 
 //anggota
 Route::middleware(['auth', 'permission:view_members'])->get('/members', fn() => view('members.index'))->name('members.index');
-Route::middleware(['auth', 'permission:manage_users'])->get('/admin/users', fn() => view('admin.users'))->name('admin.users');
 Route::middleware(['auth', 'permission:manage_expired_members'])->get('/admin/expired-members', fn() => view('admin.expired'))->name('admin.expired');
 
 //denda
@@ -67,5 +78,10 @@ Route::get('/menu/laporan', function () {
     return view('menu.laporan');
 })->name('menu.laporan');
 
+
+// INI ADALAH BLOK YANG BENAR UNTUK MENGELOLA USER, BIARKAN YANG INI
+Route::middleware(['auth', 'permission:manage_users'])->group(function () {
+    Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
+});
 
 require __DIR__.'/auth.php';

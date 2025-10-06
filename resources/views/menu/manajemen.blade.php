@@ -19,7 +19,7 @@
 
                     @if(auth()->user()->hasPermission('manage_users'))
                         <li>
-                            <a href="{{ route('admin.users') }}" class="text-gray-800 dark:text-gray-100 hover:underline">
+                            <a href="{{ route('admin.users.index') }}" class="text-gray-800 dark:text-gray-100 hover:underline">
                                 Kelola User
                             </a>
                         </li>
