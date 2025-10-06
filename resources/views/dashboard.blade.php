@@ -46,7 +46,7 @@
                             @endif
 
                             @if(auth()->user()->hasPermission('manage_users'))
-                                <li><a href="{{ route('admin.users') }}" class="text-blue-500">Kelola User</a></li>
+                                <li><a href="{{ route('admin.users.index') }}" class="text-blue-500">Kelola User</a></li>
                             @endif
 
                             @if(auth()->user()->hasPermission('manage_expired_members'))
