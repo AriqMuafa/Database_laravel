@@ -61,15 +61,17 @@ Route::middleware(['auth', 'permission:register_member'])->get('/register-member
 
 // ROLE MANAGEMENT
 Route::middleware(['auth', 'permission:manage_roles'])->group(function () {
-    Route::resource('roles', RoleController::class)->names([
-        'index'   => 'roles.index',
-        'create'  => 'roles.create',
-        'store'   => 'roles.store',
-        'show'    => 'roles.show',
-        'edit'    => 'roles.edit',
-        'update'  => 'roles.update',
-        'destroy' => 'roles.destroy',
-    ]);
+    Route::resource('roles', RoleController::class)
+        ->parameters(['roles' => 'user_role']) // 👈 ini baris penting
+        ->names([
+            'index'   => 'roles.index',
+            'create'  => 'roles.create',
+            'store'   => 'roles.store',
+            'show'    => 'roles.show',
+            'edit'    => 'roles.edit',
+            'update'  => 'roles.update',
+            'destroy' => 'roles.destroy',
+        ]);
 });
 
 Route::get('/menu/buku', function () {
@@ -88,7 +90,7 @@ Route::get('/menu/laporan', function () {
     return view('menu.laporan');
 })->name('menu.laporan');
 //route add role baru
-// Route::post('/user-roles/store', [RoleController::class, 'store'])->name('user-roles.store');
+
 
 
 
