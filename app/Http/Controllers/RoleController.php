@@ -31,7 +31,7 @@ class RoleController extends Controller
         if (!empty($permissions)) {
             $role->permissions()->attach($permissions);
         }
-        return redirect()->route('user-roles.index')->with('success', 'Role created successfully!');
+        return redirect()->route('roles.index')->with('success', 'Role created successfully!');
     }
     public function show(Role $user_role)
     {
@@ -58,15 +58,15 @@ class RoleController extends Controller
         unset($validated['permissions']);
         $user_role->update($validated);
         $user_role->permissions()->sync($permissions);
-        return redirect()->route('user-roles.index')->with('success', 'Role updated successfully!');
+        return redirect()->route('roles.index')->with('success', 'Role updated successfully!');
     }
     public function destroy(Role $user_role)
     {
         if ($user_role->users()->exists()) {
-            return redirect()->route('user-roles.index')->with('error', 'Cannot delete role with existing users.');
+            return redirect()->route('roles.index')->with('error', 'Cannot delete role with existing users.');
         }
         $user_role->permissions()->detach();
         $user_role->delete();
-        return redirect()->route('user-roles.index')->with('success', 'Role deleted successfully!');
+        return redirect()->route('roles.index')->with('success', 'Role deleted successfully!');
     }
 }

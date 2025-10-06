@@ -6,11 +6,12 @@
                 {{ __("Daftar Role User") }}
             </h2>
             @if(auth()->user()->hasPermission('manage_roles'))
-                <a href="{{ route('user-roles.create') }}"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <a href="{{ route('roles.create') }}"
+                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition">
                     Add New Role
                 </a>
             @endif
+
         </div>
     </x-slot>
     <div class="py-12">
@@ -78,14 +79,15 @@
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 @if(auth()->user()->hasPermission('manage_roles'))
-                                                                                            <a href="{{ route('user-roles.show', $role) }}"
-                                                                                                class="text-green-600 hover:text-green-900 mr-3"><a
-                                                                                                    href="{{ route('user-roles.edit', $role) }}"
-                                                                                                    class="text-indigo-600 hover:text-indigo-900 mr-<form action=" {{ route('user-roles.destroy', $role) }}" method="POST" class="inline"
-                                                                                                    onsubmit="@csrf
-                                                    @method('DELETE')
-                                                    <button type=" submit" class="text-red-600 hover:text-red-900">Delete</button>
-                                                                                                    </form>
+                                                    <a href="{{ route('roles.show', $role) }}"
+                                                        class="text-green-600 hover:text-green-900 mr-3"><a
+                                                            href="{{ route('roles.edit', $role) }}"
+                                                            class="text-indigo-600 hover:text-indigo-900 mr-<form action=" {{ route('roles.destroy', $role) }}" method="POST" class="inline"
+                                                            onsubmit="@csrf
+                                                                @method('DELETE')
+                                                                <button type=" submit"
+                                                            class="text-red-600 hover:text-red-900">Delete</button>
+                                                            </form>
                                                 @endif
                                             </td>
                                         </tr>
@@ -100,7 +102,7 @@
                         <div class="text-center py-8">
                             <p class="text-gray-500">No roles found.</p>
                             @if(auth()->user()->hasPermission('manage_roles'))
-                                <a href="{{ route('user-roles.create') }}" class="text-blue-500 hover:text-blue-700">Create your
+                                <a href="{{ route('roles.create') }}" class="text-blue-500 hover:text-blue-700">Create your
                                     first role</a>
                             @endif
                         </div>
