@@ -15,7 +15,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="mb-6">
-                <a href="{{ route('user-roles.index') }}" class="text-blue-500 hover:text-blue-700">
+                <a href="{{ route('roles.index') }}" class="text-blue-500 hover:text-blue-700">
                     ? Back to Roles
                 </a>
             </div>
