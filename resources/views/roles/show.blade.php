@@ -5,7 +5,7 @@
                 Role Details: {{ $user_role->display_name }}
             </h2>
             @if(auth()->user()->hasPermission('manage_roles'))
-                <a href="{{ route('user-roles.edit', $user_role) }}"
+                <a href="{{ route('roles.edit', $user_role) }}"
                     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Edit Role
                 </a>
@@ -16,7 +16,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="mb-6">
                 <a href="{{ route('roles.index') }}" class="text-blue-500 hover:text-blue-700">
-                    ? Back to Roles
+                     Back to Roles
                 </a>
             </div>
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
@@ -43,8 +43,18 @@
                                 </div>
                                 <div>
                                     <span class="text-sm text-gray-500">Created:</span>
-                                    <p class="font-medium">{{ $user_role->created_at->format('d M Y H:i') }}</p>
+                                    <p class="font-medium">
+                                        {{ $user_role->created_at ? $user_role->created_at->format('d M Y H:i') : '-' }}
+                                    </p>
                                 </div>
+
+                                <div>
+                                    <span class="text-sm text-gray-500">Updated:</span>
+                                    <p class="font-medium">
+                                        {{ $user_role->updated_at ? $user_role->updated_at->format('d M Y H:i') : '-' }}
+                                    </p>
+                                </div>
+
                             </div>
                         </div>
                         <div>

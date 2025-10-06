@@ -77,19 +77,32 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                                 {!! $role->status_badge !!}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-3">
                                                 @if(auth()->user()->hasPermission('manage_roles'))
+
+                                                    {{-- TOMBOL LIHAT --}}
                                                     <a href="{{ route('roles.show', $role) }}"
-                                                        class="text-green-600 hover:text-green-900 mr-3"><a
-                                                            href="{{ route('roles.edit', $role) }}"
-                                                            class="text-indigo-600 hover:text-indigo-900 mr-<form action=" {{ route('roles.destroy', $role) }}" method="POST" class="inline"
-                                                            onsubmit="@csrf
-                                                                @method('DELETE')
-                                                                <button type=" submit"
-                                                            class="text-red-600 hover:text-red-900">Delete</button>
-                                                            </form>
+                                                        class="text-green-600 hover:text-green-900">
+                                                        View
+                                                    </a>
+                                                    {{-- TOMBOL EDIT --}}
+                                                    <a href="{{ route('roles.edit', $role) }}"
+                                                        class="text-indigo-600 hover:text-indigo-900">
+                                                        Edit
+                                                    </a>
+
+                                                    {{-- FORM DELETE --}}
+                                                    <form action="{{ route('roles.destroy', $role) }}" method="POST" class="inline"
+                                                        onsubmit="return confirm('Yakin ingin menghapus role ini?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-red-600 hover:text-red-900">
+                                                            Delete
+                                                        </button>
+                                                    </form>
                                                 @endif
                                             </td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>
