@@ -35,6 +35,9 @@ class PermissionSeeder extends Seeder
 
             // Reports
             ['name' => 'view_reports', 'display_name' => 'Lihat Laporan', 'group' => 'report'],
+
+            //Kelola seeder
+            ['name' => 'manage_roles', 'display_name' => 'Kelola Role', 'group' => 'role'],
         ]);
     }
 }
