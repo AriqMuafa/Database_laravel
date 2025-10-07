@@ -22,7 +22,19 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'permission:view_books'])->get('/books', [BookController::class, 'index'])->name('books.index');
 Route::middleware(['auth', 'permission:borrow_books'])->get('/borrow', fn() => view('books.borrow'))->name('books.borrow');
 Route::middleware(['auth', 'permission:return_books'])->get('/returns', fn() => view('books.return'))->name('books.return');
-Route::middleware(['auth', 'permission:manage_books'])->get('/books/manage', fn() => view('books.manage'))->name('books.manage');
+//Route::middleware(['auth', 'permission:manage_books'])->get('/books/manage', fn() => view('books.manage'))->name('books.manage');
+
+// Buku CRUD (khusus admin & pustakawan)
+Route::middleware(['auth', 'permission:manage_books'])->group(function () {
+    Route::get('/books/manage', [BookController::class, 'manage'])->name('books.manage');
+    Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
+    Route::post('/books', [BookController::class, 'store'])->name('books.store');
+    Route::get('/books/{book}/edit', [BookController::class, 'edit'])->name('books.edit');
+    Route::put('/books/{book}', [BookController::class, 'update'])->name('books.update');
+    Route::delete('/books/{book}', [BookController::class, 'destroy'])->name('books.destroy');
+});
+
+
 Route::middleware(['auth', 'permission:manage_categories'])->get('/categories', fn() => view('books.categories'))->name('books.categories');
 
 //anggota

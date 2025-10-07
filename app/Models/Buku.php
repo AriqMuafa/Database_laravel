@@ -10,6 +10,17 @@ class Buku extends Model
     use HasFactory;
     protected $table = 'buku';
     protected $primaryKey = 'buku_id';
+    public $timestamps = true;
+
+    protected $fillable = [
+        'kategori_id',
+        'judul',
+        'pengarang',
+        'penerbit',
+        'tahun_terbit',
+        'sinopsis',
+        'stok_buku',
+    ];
 
     // Relasi: Satu Buku milik satu Kategori
     public function kategori()

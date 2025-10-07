@@ -30,6 +30,7 @@ class RolePermissionSeeder extends Seeder
                 'manage_reservations',
                 'view_fines',
                 'manage_fines',
+                'access_digital_books',
             ])->pluck('id')
         );
 
