@@ -22,6 +22,11 @@ class DatabaseSeeder extends Seeder
             PeminjamanSeeder::class,
             DendaSeeder::class, // Harus setelah Peminjaman
             ReservasiSeeder::class,
+
+            RoleSeeder::class,
+            PermissionSeeder::class,
+            RolePermissionSeeder::class,
+            UserSeeder::class,
         ]);
     }
 }
