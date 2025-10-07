@@ -35,7 +35,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 Route::middleware(['auth', 'permission:view_books'])->get('/books', [BookController::class, 'index'])->name('books.index');
 Route::middleware(['auth', 'permission:borrow_books'])->get('/borrow', fn() => view('books.borrow'))->name('books.borrow');
 Route::middleware(['auth', 'permission:return_books'])->get('/returns', fn() => view('books.return'))->name('books.return');
-Route::middleware(['auth', 'permission:manage_books'])->get('/books/manage', fn() => view('books.manage'))->name('books.manage');
+//Route::middleware(['auth', 'permission:manage_books'])->get('/books/manage', fn() => view('books.manage'))->name('books.manage');
+
+// Buku CRUD (khusus admin & pustakawan)
+Route::middleware(['auth', 'permission:manage_books'])->group(function () {
+    Route::get('/books/manage', [BookController::class, 'manage'])->name('books.manage');
+    Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
+    Route::post('/books', [BookController::class, 'store'])->name('books.store');
+    Route::get('/books/{book}/edit', [BookController::class, 'edit'])->name('books.edit');
+    Route::put('/books/{book}', [BookController::class, 'update'])->name('books.update');
+    Route::delete('/books/{book}', [BookController::class, 'destroy'])->name('books.destroy');
+});
+
+
 Route::middleware(['auth', 'permission:manage_categories'])->get('/categories', fn() => view('books.categories'))->name('books.categories');
 
 //anggota
@@ -58,11 +70,10 @@ Route::middleware(['auth', 'permission:view_reports'])->get('/admin/reports', fn
 
 //guest
 Route::middleware(['auth', 'permission:register_member'])->get('/register-member', fn() => view('guest.register'))->name('register.member');
-
 // ROLE MANAGEMENT
 Route::middleware(['auth', 'permission:manage_roles'])->group(function () {
     Route::resource('roles', RoleController::class)
-        ->parameters(['roles' => 'user_role']) // 👈 ini baris penting
+        ->parameters(['roles' => 'user_role']) 
         ->names([
             'index'   => 'roles.index',
             'create'  => 'roles.create',
@@ -89,12 +100,10 @@ Route::get('/menu/manajemen', function () {
 Route::get('/menu/laporan', function () {
     return view('menu.laporan');
 })->name('menu.laporan');
-//route add role baru
 
 
 
 
-// INI ADALAH BLOK YANG BENAR UNTUK MENGELOLA USER, BIARKAN YANG INI
 Route::middleware(['auth', 'permission:manage_users'])->group(function () {
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
 });
