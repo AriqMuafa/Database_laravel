@@ -4,6 +4,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\PeminjamanController;
 use Illuminate\Support\Facades\Route;
 
 //halaman utama
@@ -33,7 +34,31 @@ Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () 
 
 //buku
 Route::middleware(['auth', 'permission:view_books'])->get('/books', [BookController::class, 'index'])->name('books.index');
-Route::middleware(['auth', 'permission:borrow_books'])->get('/borrow', fn() => view('books.borrow'))->name('books.borrow');
+// Rute untuk menampilkan halaman Transaksi Peminjaman (yang kita buat)
+Route::middleware(['auth', 'permission:borrow_books'])
+    ->get('/borrow', [PeminjamanController::class, 'index'])
+    ->name('books.borrow');
+
+// 1. Rute untuk menampilkan form "Transaksi Baru"
+Route::middleware(['auth', 'permission:borrow_books']) // Sesuaikan permission jika perlu
+    ->get('/borrow/create', [PeminjamanController::class, 'create'])
+    ->name('peminjaman.create');
+
+// 2. Rute untuk memproses data form (menyimpan)
+Route::middleware(['auth', 'permission:borrow_books']) // Sesuaikan permission jika perlu
+    ->post('/borrow', [PeminjamanController::class, 'store'])
+    ->name('peminjaman.store');
+
+// Rute untuk tombol "Pengembalian"
+Route::middleware(['auth', 'permission:return_books']) // Sesuaikan permission jika perlu
+    ->post('/borrow/return/{peminjaman}', [PeminjamanController::class, 'kembali'])
+    ->name('peminjaman.kembali');
+
+// Rute untuk tombol "Cetak Nota"
+Route::middleware(['auth', 'permission:borrow_books']) // Sesuaikan permission jika perlu
+    ->get('/borrow/cetak/{peminjaman}', [PeminjamanController::class, 'cetak'])
+    ->name('peminjaman.cetak');
+    
 Route::middleware(['auth', 'permission:return_books'])->get('/returns', fn() => view('books.return'))->name('books.return');
 //Route::middleware(['auth', 'permission:manage_books'])->get('/books/manage', fn() => view('books.manage'))->name('books.manage');
 
