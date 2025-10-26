@@ -37,9 +37,13 @@ class BookController extends Controller
 
 
     // tambah buku baru
-    public function create()
+    public function create(Buku $book)
     {
-        return view('books.create');
+        $kategori = \App\Models\KategoriBuku::all();
+        return view('books.create', [
+            'book' => $book,
+            'kategori' => $kategori
+        ]);
     }
 
     public function store(Request $request)
