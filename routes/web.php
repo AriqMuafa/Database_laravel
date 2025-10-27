@@ -8,6 +8,7 @@ use App\Http\Controllers\DendaController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\ReservasiController;
 use Illuminate\Support\Facades\Route;
 
 //halaman utama
@@ -61,7 +62,10 @@ Route::middleware(['auth', 'permission:return_books']) // Sesuaikan permission j
 Route::middleware(['auth', 'permission:borrow_books']) // Sesuaikan permission jika perlu
     ->get('/borrow/cetak/{peminjaman}', [PeminjamanController::class, 'cetak'])
     ->name('peminjaman.cetak');
-    
+
+//bayar sekarang
+Route::post('/peminjaman/{peminjaman}/bayar', [PaymentController::class, 'proses'])->name('pembayaran.proses');
+
 Route::middleware(['auth', 'permission:return_books'])->get('/returns', fn() => view('books.return'))->name('books.return');
 //Route::middleware(['auth', 'permission:manage_books'])->get('/books/manage', fn() => view('books.manage'))->name('books.manage');
 
@@ -90,11 +94,14 @@ Route::middleware(['auth'])->group(function () {
 
         // Halaman utama "Peminjaman Saya"
         Route::get('/peminjaman-saya', [PeminjamanController::class, 'index'])->name('menu.peminjaman');
-        Route::get('/peminjaman-saya/fines', [PeminjamanController::class, 'finesIndex'])
-        ->name('fines.index');
-        
+        Route::get('/peminjaman-saya/fines/{id}', [PeminjamanController::class, 'finesIndex'])
+            ->name('fines.index');
+
         // Pembayaran Denda (Order)
-        Route::get('/peminjaman-saya/{denda}/confirm', [OrderController::class, 'confirm'])->name('orders.confirm');
+        Route::get('/peminjaman-saya/{denda}/confirm', [OrderController::class, 'confirm'])
+            ->whereNumber('denda')
+            ->name('orders.confirm');
+
         Route::post('/peminjaman-saya/{denda}/process', [OrderController::class, 'process'])->name('orders.process');
 
         // Status Pembayaran
@@ -112,10 +119,44 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-//reservasi
-Route::middleware(['auth', 'permission:reserve_books'])->get('/reservations', fn() => view('reservations.index'))->name('reservations.index');
-Route::middleware(['auth', 'permission:manage_reservations'])->get('/admin/reservations', fn() => view('admin.reservations'))->name('admin.reservations');
+// Rute baru untuk Admin/Pustakawan melihat semua pinjaman
+Route::get('/admin/peminjaman', [PeminjamanController::class, 'adminIndex'])
+     ->middleware(['permission:manage_books']) // Sesuaikan permission jika perlu
+     ->name('admin.peminjaman.index');
 
+//reservasi
+
+// Rute untuk USER melihat halaman "Reservasi Saya" (MENGGANTIKAN RUTE LAMA)
+Route::middleware(['auth', 'permission:reserve_books'])
+    ->get('/reservations', [ReservasiController::class, 'myReservations'])
+    ->name('reservations.index');
+
+// Rute untuk USER membuat reservasi (BARU)
+Route::post('/reservasi/{buku}', [ReservasiController::class, 'store'])
+    ->middleware(['auth', 'permission:reserve_books']) 
+    ->name('reservasi.store');
+
+// GANTI RUTE LAMA INI:
+// Route::middleware(['auth', 'permission:manage_reservations'])->get('/admin/reservations', fn() => view('admin.reservations'))->name('admin.reservations');
+
+// DENGAN 4 RUTE BARU INI:
+Route::middleware(['auth', 'permission:manage_reservations'])->group(function () {
+    // 1. Halaman utama Kelola Reservasi
+    Route::get('/admin/reservations', [ReservasiController::class, 'index'])
+        ->name('admin.reservations');
+
+    // 2. Tombol "Tandai Siap Diambil"
+    Route::post('/admin/reservations/siap/{reservasi}', [ReservasiController::class, 'tandaiSiapDiambil'])
+        ->name('admin.reservations.siap');
+
+    // 3. Tombol "Proses Peminjaman"
+    Route::post('/admin/reservations/proses/{reservasi}', [ReservasiController::class, 'prosesPeminjaman'])
+        ->name('admin.reservations.proses');
+
+    // 4. Tombol "Batalkan"
+    Route::post('/admin/reservations/batal/{reservasi}', [ReservasiController::class, 'batalkan'])
+        ->name('admin.reservations.batal');
+});
 //buku digital
 Route::middleware(['auth', 'permission:access_digital_books'])->get('/digital-books', fn() => view('digital.index'))->name('digital.index');
 
@@ -127,14 +168,14 @@ Route::middleware(['auth', 'permission:register_member'])->get('/register-member
 // ROLE MANAGEMENT
 Route::middleware(['auth', 'permission:manage_roles'])->group(function () {
     Route::resource('roles', RoleController::class)
-        ->parameters(['roles' => 'user_role']) 
+        ->parameters(['roles' => 'user_role'])
         ->names([
-            'index'   => 'roles.index',
-            'create'  => 'roles.create',
-            'store'   => 'roles.store',
-            'show'    => 'roles.show',
-            'edit'    => 'roles.edit',
-            'update'  => 'roles.update',
+            'index' => 'roles.index',
+            'create' => 'roles.create',
+            'store' => 'roles.store',
+            'show' => 'roles.show',
+            'edit' => 'roles.edit',
+            'update' => 'roles.update',
             'destroy' => 'roles.destroy',
         ]);
 });
@@ -166,4 +207,4 @@ Route::middleware(['auth', 'permission:manage_users'])->group(function () {
 // Webhook Route (no auth middleware)
 Route::post('/webhook/payment', [WebhookController::class, 'handlePayment'])->name('webhook.payment');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

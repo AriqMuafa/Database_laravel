@@ -47,6 +47,18 @@
             @endif
         </div>
 
+        <div class="mt-4">
+            <x-input-label for="alamat" :value="__('Alamat Lengkap')" />
+            <x-text-input id="alamat" name="alamat" type="text" class="mt-1 block w-full" :value="old('alamat', Auth::user()->anggota->alamat ?? '')" required autocomplete="street-address" />
+            <x-input-error class="mt-2" :messages="$errors->get('alamat')" />
+        </div>
+
+        <div class="mt-4">
+            <x-input-label for="telepon" :value="__('Nomor Telepon')" />
+            <x-text-input id="telepon" name="telepon" type="text" class="mt-1 block w-full" :value="old('telepon', Auth::user()->anggota->telepon ?? '')" required autocomplete="tel" />
+            <x-input-error class="mt-2" :messages="$errors->get('telepon')" />
+        </div>
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 

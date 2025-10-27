@@ -3,6 +3,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Role;
+use App\Models\Anggota;
 
 class User extends Authenticatable
 {
@@ -60,4 +61,11 @@ class User extends Authenticatable
  {
  return $this->getRoleName() === 'customer';
  }
+ /**
+ * Mendapatkan data anggota yang terkait dengan user.
+ */
+public function anggota()
+{
+    return $this->hasOne(Anggota::class, 'user_id', 'id');
+}
 }
