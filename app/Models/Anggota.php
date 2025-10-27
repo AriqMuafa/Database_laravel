@@ -22,6 +22,7 @@ class Anggota extends Model
         'alamat',
         'telepon',
         'tanggal_daftar',
+        'user_id',
     ];
 
     // Relasi: Satu Anggota bisa memiliki banyak Peminjaman

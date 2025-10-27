@@ -40,6 +40,14 @@
                             </a>
                         </li>
                     @endif
+                    
+                    @if(auth()->user()->hasPermission('manage_books'))
+                        <li>
+                            <a href="{{ route('admin.peminjaman.index') }}" class="text-gray-800 dark:text-gray-100 hover:underline">
+                                Kelola Peminjaman
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </div>
         </div>

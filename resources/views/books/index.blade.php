@@ -24,6 +24,7 @@
                             <th class="px-4 py-2 border">Tahun Terbit</th>
                             <th class="px-4 py-2 border">Sinopsis</th>
                             <th class="px-4 py-2 border">Stok Buku</th>
+                            <th class="px-4 py-2 border">Opsi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -36,10 +37,35 @@
                                 <td class="px-4 py-2 border">{{ $book->tahun_terbit }}</td>
                                 <td class="px-4 py-2 border">{{ $book->sinopsis }}</td>
                                 <td class="px-4 py-2 border">{{ $book->stok_buku }}</td>
+                                <td class="px-4 py-2 border">
+                                    {{-- Cek dulu apakah user sudah jadi anggota --}}
+                                    @if (Auth::user()->anggota)
+                                    
+                                        {{-- Jika stok ADA, tombol nonaktif --}}
+                                        @if ($book->stok_buku > 0)
+                                            <button class="bg-gray-700 text-white font-bold py-1 px-2 rounded text-xs opacity-50 cursor-not-allowed">
+                                                Reservasi
+                                            </button>
+                                        {{-- Jika stok KOSONG, tombol reservasi aktif --}}
+                                        @else
+                                                <form action="{{ route('reservasi.store', $book->buku_id) }}" method="POST" onsubmit="return confirm('Anda akan masuk antrean untuk buku ini. Lanjutkan?');">                                                @csrf
+                                                <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded text-xs">
+                                                    Reservasi
+                                                </button>
+                                            </form>
+                                        @endif
+                                        
+                                    {{-- Jika user belum jadi anggota, suruh lengkapi profil --}}
+                                    @else
+                                        <a href="{{ route('profile.edit') }}" class="text-yellow-400 text-xs">
+                                            Lengkapi Profil
+                                        </a>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="px-4 py-2 border text-center">Belum ada buku.</td>
+                                <td colspan="8" class="px-4 py-2 border text-center">Belum ada buku.</td>
                             </tr>
                         @endforelse
                     </tbody>
