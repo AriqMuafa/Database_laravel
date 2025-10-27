@@ -27,7 +27,7 @@
 
                     @if(auth()->user()->hasPermission('manage_fines'))
                         <li>
-                            <a href="{{ route('admin.fines') }}" class="text-gray-800 dark:text-gray-100 hover:underline">
+                            <a href="{{ route('fines.admin') }}" class="text-gray-800 dark:text-gray-100 hover:underline">
                                 Kelola Denda
                             </a>
                         </li>
