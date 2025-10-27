@@ -125,6 +125,7 @@ class PeminjamanController extends Controller
         return "Halaman Cetak Nota untuk Peminjaman ID: " . $peminjaman->id;
     }
 
+
     /**
      * Menampilkan form untuk membuat transaksi peminjaman baru.
      */
