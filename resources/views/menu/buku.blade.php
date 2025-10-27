@@ -19,7 +19,7 @@
                         <li><a href="{{ route('books.return') }}" class="text-gray-800 dark:text-gray-100 hover:underline">Pengembalian Buku</a></li>
                     @endif
                     @if(auth()->user()->hasPermission('view_fines'))
-                        <li><a href="{{ route('fines.index') }}" class="text-gray-800 dark:text-gray-100 hover:underline">Lihat Denda</a></li>
+                        <li><a href="{{ route('fines.index', ['id' => auth()->id()]) }}" class="text-gray-800 dark:text-gray-100 hover:underline">Lihat Denda</a></li>
                     @endif
                     @if(auth()->user()->hasPermission('reserve_books'))
                         <li><a href="{{ route('reservations.index') }}" class="text-gray-800 dark:text-gray-100 hover:underline">Reservasi Buku</a></li>
