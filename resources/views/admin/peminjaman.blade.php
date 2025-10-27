@@ -1,7 +1,7 @@
-{{--
-CATATAN:
-File ini mengasumsikan Anda menggunakan layout standar Laravel Breeze/Jetstream
-yang menggunakan Tailwind CSS dan memiliki dark mode.
+{{-- 
+  CATATAN: 
+  File ini mengasumsikan Anda menggunakan layout standar Laravel Breeze/Jetstream 
+  yang menggunakan Tailwind CSS dan memiliki dark mode.
 --}}
 <x-app-layout>
     {{-- Bagian Header Halaman --}}
@@ -18,15 +18,13 @@ yang menggunakan Tailwind CSS dan memiliki dark mode.
 
                     {{-- Tombol Transaksi Baru --}}
                     {{-- TODO: Ganti '#' dengan rute untuk membuat transaksi baru --}}
-                    <a href="{{ route('peminjaman.create') }}"
-                        class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4">
+                    <a href="{{ route('peminjaman.create') }}" class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4">
                         Transaksi Baru
                     </a>
 
                     {{-- Pesan sukses jika berhasil mengembalikan buku --}}
                     @if (session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4"
-                            role="alert">
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
                             {{ session('success') }}
                         </div>
                     @endif
@@ -49,22 +47,21 @@ yang menggunakan Tailwind CSS dan memiliki dark mode.
                                     <th scope="col" class="py-3 px-6">Opsi</th>
                                 </tr>
                             </thead>
-
+                            
                             {{-- Isi Tabel --}}
                             <tbody>
                                 @forelse ($data_peminjaman as $pinjam)
                                     {{-- Baris tabel: ganti warna ganjil/genap agar mirip "striped" --}}
-                                    <tr
-                                        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                         <td class="py-4 px-6">{{ $loop->iteration }}</td>
                                         <td class="py-4 px-6">{{ $pinjam->peminjaman_id }}</td>
-
+                                        
                                         {{-- Data Anggota --}}
                                         <td class="py-4 px-6">{{ $pinjam->anggota->anggota_id }}</td> {{-- PERBAIKAN --}}
                                         <td class="py-4 px-6 font-medium text-gray-900 dark:text-white whitespace-nowrap">
                                             {{ $pinjam->anggota->nama }}
                                         </td>
-
+                                        
                                         {{-- Data Buku --}}
                                         <td class="py-4 px-6">{{ $pinjam->buku->buku_id }}</td>
                                         <td class="py-4 px-6">{{ $pinjam->buku->judul }}</td>
@@ -90,20 +87,20 @@ yang menggunakan Tailwind CSS dan memiliki dark mode.
                                         {{-- Tombol Opsi --}}
                                         <td class="py-4 px-6 flex space-x-2">
                                             {{-- Tombol Cetak Nota --}}
-                                            <a href="{{ route('peminjaman.cetak', $pinjam->peminjaman_id) }}" target="_blank"
-                                                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded text-xs">
-                                                Bayar Sekarang
+                                            <a href="{{ route('peminjaman.cetak', $pinjam) }}" 
+                                               target="_blank"
+                                               class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded text-xs">
+                                               Bayar Sekarang
                                             </a>
 
-
-
                                             {{-- Tombol Pengembalian --}}
-                                            <form action="{{ route('peminjaman.kembali', $pinjam) }}" method="POST"
-                                                onsubmit="return confirm('Apakah Anda yakin ingin mengembalikan buku ini?');">
+                                            <form action="{{ route('peminjaman.kembali', $pinjam) }}" 
+                                                  method="POST" 
+                                                  onsubmit="return confirm('Apakah Anda yakin ingin mengembalikan buku ini?');">
                                                 @csrf
-                                                <button type="submit"
-                                                    class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded text-xs">
-                                                    Pengembalian
+                                                <button type="submit" 
+                                                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded text-xs">
+                                                        Pengembalian
                                                 </button>
                                             </form>
                                         </td>

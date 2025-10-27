@@ -8,6 +8,7 @@ use App\Http\Controllers\DendaController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\ReservasiController;
 use Illuminate\Support\Facades\Route;
 
 //halaman utama
@@ -118,10 +119,44 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-//reservasi
-Route::middleware(['auth', 'permission:reserve_books'])->get('/reservations', fn() => view('reservations.index'))->name('reservations.index');
-Route::middleware(['auth', 'permission:manage_reservations'])->get('/admin/reservations', fn() => view('admin.reservations'))->name('admin.reservations');
+// Rute baru untuk Admin/Pustakawan melihat semua pinjaman
+Route::get('/admin/peminjaman', [PeminjamanController::class, 'adminIndex'])
+     ->middleware(['permission:manage_books']) // Sesuaikan permission jika perlu
+     ->name('admin.peminjaman.index');
 
+//reservasi
+
+// Rute untuk USER melihat halaman "Reservasi Saya" (MENGGANTIKAN RUTE LAMA)
+Route::middleware(['auth', 'permission:reserve_books'])
+    ->get('/reservations', [ReservasiController::class, 'myReservations'])
+    ->name('reservations.index');
+
+// Rute untuk USER membuat reservasi (BARU)
+Route::post('/reservasi/{buku}', [ReservasiController::class, 'store'])
+    ->middleware(['auth', 'permission:reserve_books']) 
+    ->name('reservasi.store');
+
+// GANTI RUTE LAMA INI:
+// Route::middleware(['auth', 'permission:manage_reservations'])->get('/admin/reservations', fn() => view('admin.reservations'))->name('admin.reservations');
+
+// DENGAN 4 RUTE BARU INI:
+Route::middleware(['auth', 'permission:manage_reservations'])->group(function () {
+    // 1. Halaman utama Kelola Reservasi
+    Route::get('/admin/reservations', [ReservasiController::class, 'index'])
+        ->name('admin.reservations');
+
+    // 2. Tombol "Tandai Siap Diambil"
+    Route::post('/admin/reservations/siap/{reservasi}', [ReservasiController::class, 'tandaiSiapDiambil'])
+        ->name('admin.reservations.siap');
+
+    // 3. Tombol "Proses Peminjaman"
+    Route::post('/admin/reservations/proses/{reservasi}', [ReservasiController::class, 'prosesPeminjaman'])
+        ->name('admin.reservations.proses');
+
+    // 4. Tombol "Batalkan"
+    Route::post('/admin/reservations/batal/{reservasi}', [ReservasiController::class, 'batalkan'])
+        ->name('admin.reservations.batal');
+});
 //buku digital
 Route::middleware(['auth', 'permission:access_digital_books'])->get('/digital-books', fn() => view('digital.index'))->name('digital.index');
 

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Models\Anggota;
 
 class ProfileController extends Controller
 {
@@ -33,6 +34,25 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
+
+        // 2. Validasi tambahan untuk data anggota
+        $request->validate([
+            'alamat' => 'required|string|max:255',
+            'telepon' => 'required|string|max:15',
+        ]);
+
+        // 3. Simpan atau Perbarui data anggota
+        // 'updateOrCreate' akan mencari anggota dengan user_id ini,
+        // jika tidak ada, akan membuat data baru.
+        Anggota::updateOrCreate(
+            ['user_id' => $request->user()->id], // Kunci untuk mencari
+            [
+                'nama' => $request->user()->name, // Ambil nama dari data user
+                'alamat' => $request->alamat,
+                'telepon' => $request->telepon,
+                'tanggal_daftar' => now() // Set tanggal daftar jika ini data baru
+            ]
+        );
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
