@@ -1,0 +1,74 @@
+/*
+ * File ini berisi style khusus untuk Halaman Peminjaman (Layout Card)
+ */
+
+.peminjaman-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.peminjaman-card {
+    @apply bg-white dark:bg-gray-700 shadow-md rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl;
+}
+
+.peminjaman-card-content {
+    @apply p-5;
+}
+
+.card-title {
+    @apply text-lg font-semibold text-gray-900 dark:text-white mb-3 truncate;
+}
+
+.card-details {
+    @apply space-y-2 mb-4;
+}
+
+.card-detail-item {
+    @apply flex justify-between text-sm;
+}
+
+.card-detail-label {
+    @apply text-gray-500 dark:text-gray-400;
+}
+
+.card-detail-value {
+    @apply font-medium text-gray-800 dark:text-gray-200;
+}
+
+.card-status-section {
+    @apply flex justify-between items-center;
+}
+
+.card-action-section {
+    @apply border-t border-gray-200 dark:border-gray-600 mt-4 pt-4;
+}
+
+.card-button-denda {
+    @apply w-full text-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 dark:bg-red-500 dark:hover:bg-red-600 dark:focus:ring-red-800;
+}
+
+.card-empty-state {
+    @apply text-center text-gray-500 dark:text-gray-400 col-span-full py-10;
+}
+
+
+/* --- Status Badges (Ini masih kita perlukan) --- */
+
+.status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.status-badge-dipinjam {
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300;
+}
+
+.status-badge-dikembalikan {
+    @apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300;
+}
+
+.status-badge-denda {
+    @apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300;
+}
+
+.status-badge-lainnya {
+    @apply bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300;
+}

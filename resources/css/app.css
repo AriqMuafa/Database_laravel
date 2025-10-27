@@ -1,3 +1,6 @@
+@import './peminjaman.css'; 
+@import './pembayaran.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

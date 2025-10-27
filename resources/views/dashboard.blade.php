@@ -30,6 +30,11 @@
                         <div class="font-semibold text-lg text-center">Buku</div>
                     </a>
 
+                    {{-- Peminjaman Saya --}}
+                    <a href="{{ route('profile.peminjaman') }}"
+                        class="block bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 text-blue-800 dark:text-blue-100 p-6 rounded-xl shadow transition mb-5">
+                        <div class="font-semibold text-lg text-center">Peminjaman Saya</div>
+                    </a>
                     {{-- Anggota --}}
                     @if(auth()->user()->hasPermission('view_members'))
                         <a href="{{ route('menu.anggota') }}"

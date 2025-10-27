@@ -18,6 +18,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Route Anda yang sudah benar
+    Route::get('/pembayaran/{id}', [ProfileController::class, 'pembayaranShow'])
+         ->name('pembayaran.show');
+
+    // --- TAMBAHKAN ROUTE YANG HILANG INI ---
+    Route::get('/peminjaman-saya', [ProfileController::class, 'peminjaman'])
+         ->name('profile.peminjaman');
 });
 
 Route::resource('users', App\Http\Controllers\UserController::class);
