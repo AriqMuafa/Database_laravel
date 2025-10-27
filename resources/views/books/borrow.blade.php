@@ -92,7 +92,7 @@ yang menggunakan Tailwind CSS dan memiliki dark mode.
                                             {{-- Tombol Cetak Nota --}}
                                             <a href="{{ route('peminjaman.cetak', $pinjam->peminjaman_id) }}" target="_blank"
                                                 class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded text-xs">
-                                                Bayar Sekarang
+                                                Lihat nota
                                             </a>
 
 

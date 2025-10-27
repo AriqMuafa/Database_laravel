@@ -124,8 +124,17 @@ class OrderController extends Controller
         if ($order->user_id !== auth()->id())
             abort(403);
 
-        if (!$order->isPaid())
+        if (!$order->isPaid()) {
+            if ($order->denda_id) {
+                $denda = Denda::find($order->denda_id);
+                if ($denda && $denda->status !== 'lunas') {
+                    $denda->update(['status' => 'lunas']);
+                }
+            }
             return redirect()->route('fines.waiting', $order);
+
+
+        }
 
         return view('fines.success', compact('order'));
     }

@@ -194,6 +194,10 @@ Route::get('/menu/anggota', fn() => view('menu.anggota'))->name('menu.anggota');
 Route::get('/menu/manajemen', fn() => view('menu.manajemen'))->name('menu.manajemen');
 Route::get('/menu/laporan', fn() => view('menu.laporan'))->name('menu.laporan');
 
+Route::middleware(['auth', 'permission:manage_users'])->group(function () {
+    Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
+});
+
 /*
 |--------------------------------------------------------------------------
 | WEBHOOK
