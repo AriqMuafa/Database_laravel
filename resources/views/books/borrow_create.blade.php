@@ -35,13 +35,12 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                             <div>
-                                <label for="anggota_id" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Nama Anggota</label>
-                                <select name="anggota_id" id="anggota_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-indigo-500 focus:ring-indigo-500" required>
-                                    <option value="">-- Pilih Anggota --</option>
-                                    @foreach ($anggota as $agt)
-                                        <option value="{{ $agt->anggota_id }}">{{ $agt->id_anggota }} - {{ $agt->nama }}</option>
-                                    @endforeach
-                                </select>
+                                <label for="nama_anggota" class="block font-medium text-sm text-gray-700 dark:text-gray-300">Nama Anggota</label>
+                                <input type="text" id="nama_anggota"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-900 dark:text-gray-400 dark:border-gray-700 cursor-not-allowed"
+                                    value="{{ $anggota->nama }} ({{ $anggota->anggota_id }})"
+                                    disabled>
+                                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Nama diisi otomatis dari akun Anda.</p>
                             </div>
 
                             <div>

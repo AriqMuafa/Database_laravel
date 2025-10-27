@@ -133,9 +133,23 @@ class PeminjamanController extends Controller
     /**
      * Menampilkan form untuk membuat transaksi peminjaman baru.
      */
+    /**
+     * Menampilkan form untuk membuat transaksi peminjaman baru (UNTUK ANGGOTA).
+     */
+    /**
+     * Menampilkan form untuk membuat transaksi peminjaman baru (UNTUK ANGGOTA).
+     */
     public function create()
     {
-        $anggota = Anggota::orderBy('nama', 'asc')->get();
+        // Ambil data anggota dari user yang login
+        $anggota = Auth::user()->anggota;
+
+        // Jika user ini belum terdaftar sebagai anggota, paksa lengkapi profil
+        if (!$anggota) {
+            return redirect()->route('profile.edit')->with('error', 'Anda harus melengkapi data anggota di Profil Anda untuk meminjam.');
+        }
+
+        // Ambil semua buku yang stoknya masih ada
         $buku = Buku::where('stok_buku', '>', 0)->orderBy('judul', 'asc')->get();
 
         return view('books.borrow_create', compact('anggota', 'buku'));
@@ -144,27 +158,42 @@ class PeminjamanController extends Controller
     /**
      * Menyimpan transaksi peminjaman baru ke database.
      */
+    /**
+     * Menyimpan transaksi peminjaman baru ke database (DARI ANGGOTA).
+     */
     public function store(Request $request)
     {
+        // Ambil data anggota dari user yang login
+        $anggota = Auth::user()->anggota;
+
+        // Cek lagi jika belum jadi anggota
+        if (!$anggota) {
+            return redirect()->route('profile.edit')->with('error', 'Anda harus melengkapi data anggota di Profil Anda untuk meminjam.');
+        }
+
+        // 1. Validasi data input (anggota_id dihapus dari validasi)
         $request->validate([
-            'anggota_id' => 'required|exists:anggota,anggota_id',
             'buku_id' => 'required|exists:buku,buku_id',
             'tanggal_pinjam' => 'required|date',
         ]);
 
+        // Atur tanggal jatuh tempo, misal 7 hari dari tanggal pinjam
         $tanggal_jatuh_tempo = Carbon::parse($request->tanggal_pinjam)->addDays(7);
 
+        // 2. Gunakan DB Transaction
         try {
             DB::beginTransaction();
 
+            // 3. Simpan data peminjaman
             Peminjaman::create([
-                'anggota_id' => $request->anggota_id,
+                'anggota_id' => $anggota->anggota_id, // <-- Ambil dari Auth
                 'buku_id' => $request->buku_id,
                 'tanggal_pinjam' => $request->tanggal_pinjam,
                 'tanggal_jatuh_tempo' => $tanggal_jatuh_tempo,
-                'id_peminjaman' => 'TR032' . time(),
+                'id_peminjaman' => 'TR' . time(), // <-- Tetap gunakan ID unik jika Anda mau
             ]);
 
+            // 4. Kurangi stok buku
             $buku = Buku::where('buku_id', $request->buku_id)->first();
             if ($buku) {
                 $buku->decrement('stok_buku');
@@ -172,14 +201,14 @@ class PeminjamanController extends Controller
                 throw new \Exception('Data buku tidak ditemukan saat pengurangan stok.');
             }
 
-            DB::commit();
+            DB::commit(); 
 
         } catch (\Exception $e) {
-            DB::rollBack();
+            DB::rollBack(); 
             return back()->with('error', 'Gagal menyimpan transaksi: ' . $e->getMessage());
         }
 
-        // Redirect ke halaman Admin, bukan halaman user
-        return redirect()->route('admin.peminjaman.index')->with('success', 'Transaksi peminjaman baru berhasil ditambahkan.');
+        // 5. Redirect kembali ke halaman "Peminjaman Saya" (books.borrow)
+        return redirect()->route('books.borrow')->with('success', 'Buku berhasil dipinjam!');
     }
 }
