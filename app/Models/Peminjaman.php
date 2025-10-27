@@ -26,6 +26,12 @@ class Peminjaman extends Model
         'peminjaman_id'
     ];
 
+    protected $casts = [
+        'tanggal_pinjam' => 'datetime',
+        'tanggal_jatuh_tempo' => 'datetime',
+        'tanggal_pengembalian' => 'datetime',
+    ];
+
     // Relasi: Satu Peminjaman milik satu Anggota
     public function anggota()
     {

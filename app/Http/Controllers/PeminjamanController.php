@@ -20,9 +20,9 @@ class PeminjamanController extends Controller
         // 'with(['anggota', 'buku'])' adalah Eager Loading
         // Ini mengambil data relasi agar efisien
         $data_peminjaman = Peminjaman::with(['anggota', 'buku'])
-                            ->whereNull('tanggal_pengembalian') // <-- Hanya tampilkan yang masih dipinjam
-                            ->orderBy('tanggal_pinjam', 'asc')
-                            ->get();
+            ->whereNull('tanggal_pengembalian') // <-- Hanya tampilkan yang masih dipinjam
+            ->orderBy('tanggal_pinjam', 'asc')
+            ->get();
 
         // Kirim data ke view
         return view('books.borrow', compact('data_peminjaman'));
@@ -47,10 +47,13 @@ class PeminjamanController extends Controller
      */
     public function cetak(Peminjaman $peminjaman)
     {
-        // Anda bisa tambahkan logika untuk generate PDF atau halaman cetak di sini
-        // Untuk sekarang, kita hanya tampilkan pesan
-        return "Halaman Cetak Nota untuk Peminjaman ID: " . $peminjaman->id;
+        // Ambil relasi denda jika ada
+        $peminjaman->load('anggota', 'buku', 'denda');
+
+        // Kirim data ke view
+        return view('books.borrow_cetak', compact('peminjaman'));
     }
+
 
     /**
      * Menampilkan form untuk membuat transaksi peminjaman baru.
@@ -59,7 +62,7 @@ class PeminjamanController extends Controller
     {
         // Ambil semua anggota untuk dropdown
         $anggota = Anggota::orderBy('nama', 'asc')->get();
-        
+
         // Ambil semua buku yang stoknya masih ada
         $buku = Buku::where('stok_buku', '>', 0)->orderBy('judul', 'asc')->get();
 
@@ -75,10 +78,10 @@ class PeminjamanController extends Controller
         $request->validate([
             // Cek di tabel 'anggota' pada kolom 'anggota_id'
             'anggota_id' => 'required|exists:anggota,anggota_id',
-            
+
             // Cek di tabel 'buku' pada kolom 'buku_id'
             'buku_id' => 'required|exists:buku,buku_id',
-            
+
             'tanggal_pinjam' => 'required|date',
         ]);
 

@@ -61,7 +61,10 @@ Route::middleware(['auth', 'permission:return_books']) // Sesuaikan permission j
 Route::middleware(['auth', 'permission:borrow_books']) // Sesuaikan permission jika perlu
     ->get('/borrow/cetak/{peminjaman}', [PeminjamanController::class, 'cetak'])
     ->name('peminjaman.cetak');
-    
+
+//bayar sekarang
+Route::post('/peminjaman/{peminjaman}/bayar', [PaymentController::class, 'proses'])->name('pembayaran.proses');
+
 Route::middleware(['auth', 'permission:return_books'])->get('/returns', fn() => view('books.return'))->name('books.return');
 //Route::middleware(['auth', 'permission:manage_books'])->get('/books/manage', fn() => view('books.manage'))->name('books.manage');
 
@@ -90,11 +93,14 @@ Route::middleware(['auth'])->group(function () {
 
         // Halaman utama "Peminjaman Saya"
         Route::get('/peminjaman-saya', [PeminjamanController::class, 'index'])->name('menu.peminjaman');
-        Route::get('/peminjaman-saya/fines', [PeminjamanController::class, 'finesIndex'])
-        ->name('fines.index');
-        
+        Route::get('/peminjaman-saya/fines/{id}', [PeminjamanController::class, 'finesIndex'])
+            ->name('fines.index');
+
         // Pembayaran Denda (Order)
-        Route::get('/peminjaman-saya/{denda}/confirm', [OrderController::class, 'confirm'])->name('orders.confirm');
+        Route::get('/peminjaman-saya/{denda}/confirm', [OrderController::class, 'confirm'])
+            ->whereNumber('denda')
+            ->name('orders.confirm');
+
         Route::post('/peminjaman-saya/{denda}/process', [OrderController::class, 'process'])->name('orders.process');
 
         // Status Pembayaran
@@ -127,14 +133,14 @@ Route::middleware(['auth', 'permission:register_member'])->get('/register-member
 // ROLE MANAGEMENT
 Route::middleware(['auth', 'permission:manage_roles'])->group(function () {
     Route::resource('roles', RoleController::class)
-        ->parameters(['roles' => 'user_role']) 
+        ->parameters(['roles' => 'user_role'])
         ->names([
-            'index'   => 'roles.index',
-            'create'  => 'roles.create',
-            'store'   => 'roles.store',
-            'show'    => 'roles.show',
-            'edit'    => 'roles.edit',
-            'update'  => 'roles.update',
+            'index' => 'roles.index',
+            'create' => 'roles.create',
+            'store' => 'roles.store',
+            'show' => 'roles.show',
+            'edit' => 'roles.edit',
+            'update' => 'roles.update',
             'destroy' => 'roles.destroy',
         ]);
 });
@@ -166,4 +172,4 @@ Route::middleware(['auth', 'permission:manage_users'])->group(function () {
 // Webhook Route (no auth middleware)
 Route::post('/webhook/payment', [WebhookController::class, 'handlePayment'])->name('webhook.payment');
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
