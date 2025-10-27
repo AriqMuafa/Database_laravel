@@ -54,23 +54,41 @@ Route::middleware(['auth', 'permission:manage_roles'])->group(function () {
         ]);
 });
 
-/*
-|--------------------------------------------------------------------------
-| BUKU
-|--------------------------------------------------------------------------
-*/
 
-Route::middleware(['auth', 'permission:view_books'])
-    ->get('/books', [BookController::class, 'index'])->name('books.index');
+//buku
+Route::middleware(['auth', 'permission:view_books'])->get('/books', [BookController::class, 'index'])->name('books.index');
+// Rute untuk menampilkan halaman Transaksi Peminjaman (yang kita buat)
+Route::middleware(['auth', 'permission:borrow_books'])
+    ->get('/borrow', [PeminjamanController::class, 'index'])
+    ->name('books.borrow');
 
-Route::middleware(['auth', 'permission:borrow_books'])->group(function () {
-    Route::get('/borrow', [PeminjamanController::class, 'index'])->name('books.borrow');
-    Route::get('/borrow/create', [PeminjamanController::class, 'create'])->name('peminjaman.create');
-    Route::post('/borrow', [PeminjamanController::class, 'store'])->name('peminjaman.store');
-    Route::post('/borrow/return/{peminjaman}', [PeminjamanController::class, 'kembali'])->name('peminjaman.kembali');
-    Route::get('/borrow/cetak/{peminjaman}', [PeminjamanController::class, 'cetak'])->name('peminjaman.cetak');
-});
+// 1. Rute untuk menampilkan form "Transaksi Baru"
+Route::middleware(['auth', 'permission:borrow_books']) // Sesuaikan permission jika perlu
+    ->get('/borrow/create', [PeminjamanController::class, 'create'])
+    ->name('peminjaman.create');
 
+// 2. Rute untuk memproses data form (menyimpan)
+Route::middleware(['auth', 'permission:borrow_books']) // Sesuaikan permission jika perlu
+    ->post('/borrow', [PeminjamanController::class, 'store'])
+    ->name('peminjaman.store');
+
+// Rute untuk tombol "Pengembalian"
+Route::middleware(['auth', 'permission:return_books']) // Sesuaikan permission jika perlu
+    ->post('/borrow/return/{peminjaman}', [PeminjamanController::class, 'kembali'])
+    ->name('peminjaman.kembali');
+
+// Rute untuk tombol "Cetak Nota"
+Route::middleware(['auth', 'permission:borrow_books']) // Sesuaikan permission jika perlu
+    ->get('/borrow/cetak/{peminjaman}', [PeminjamanController::class, 'cetak'])
+    ->name('peminjaman.cetak');
+
+//bayar sekarang
+//Route::post('/peminjaman/{peminjaman}/bayar', [PaymentController::class, 'proses'])->name('pembayaran.proses');
+
+Route::middleware(['auth', 'permission:return_books'])->get('/returns', fn() => view('books.return'))->name('books.return');
+//Route::middleware(['auth', 'permission:manage_books'])->get('/books/manage', fn() => view('books.manage'))->name('books.manage');
+
+// Buku CRUD (khusus admin & pustakawan)
 Route::middleware(['auth', 'permission:manage_books'])->group(function () {
     Route::get('/books/manage', [BookController::class, 'manage'])->name('books.manage');
     Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
