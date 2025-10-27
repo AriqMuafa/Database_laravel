@@ -123,7 +123,7 @@ class PeminjamanController extends Controller
     public function cetak(Peminjaman $peminjaman)
     {
         // Pastikan relasi dengan buku & anggota sudah di-load
-        $peminjaman->load(['buku', 'anggota']);
+        $peminjaman->load(['buku', 'anggota', 'denda']);
 
         // Kirim data ke view books/borrow_cetak.blade.php
         return view('books.borrow_cetak', compact('peminjaman'));

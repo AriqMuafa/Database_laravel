@@ -31,7 +31,7 @@ class Order extends Model
 
     public function denda()
     {
-        return $this->belongsTo(Denda::class);
+        return $this->belongsTo(Denda::class, 'denda_id', 'denda_id');
     }
 
     public function isPending()
