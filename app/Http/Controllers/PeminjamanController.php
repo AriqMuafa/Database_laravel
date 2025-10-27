@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use App\Models\Peminjaman;
 use App\Models\Anggota;
 use App\Models\Buku;
+use App\Models\Denda;
 
 class PeminjamanController extends Controller
 {
@@ -87,36 +88,76 @@ class PeminjamanController extends Controller
     /**
      * Proses untuk mengembalikan buku dan menambah stok.
      */
+    /**
+     * Proses untuk mengembalikan buku, menambah stok, dan mencatat denda jika ada.
+     */
     public function kembali(Peminjaman $peminjaman)
     {
-        // Gunakan DB Transaction untuk memastikan 2 aksi berjalan sukses
+        // --- AWAL PERHITUNGAN DENDA (VERSI PERBAIKAN) ---
+        $tarif_denda_per_hari = 1000;
+        $hari_ini = now()->startOfDay(); // <-- Pakai startOfDay() agar perbandingan akurat
+        $total_denda = 0;
+        $hari_terlambat = 0;
+
+        // Pastikan tanggal jatuh tempo valid dan set ke awal hari
+        try {
+             $jatuh_tempo = Carbon::parse($peminjaman->tanggal_jatuh_tempo)->startOfDay();
+        } catch (\Exception $e) {
+             // Jika tanggal jatuh tempo tidak valid, anggap tidak ada denda
+             $jatuh_tempo = null;
+             \Log::error("Invalid date format for jatuh_tempo: " . $peminjaman->tanggal_jatuh_tempo); // Catat error
+        }
+
+        // Hitung denda HANYA jika tanggal valid dan hari ini sudah lewat jatuh tempo
+        if ($jatuh_tempo && $hari_ini->isAfter($jatuh_tempo)) {
+             // Hitung selisih hari (gunakan parameter false agar tidak absolut, lalu ambil max 0)
+             $hari_terlambat = max(0, $jatuh_tempo->diffInDays($hari_ini, false));
+             $total_denda = $hari_terlambat * $tarif_denda_per_hari;
+        }
+        // --- AKHIR PERHITUNGAN DENDA ---
         try {
             DB::beginTransaction();
 
-            // 1. Update kolom 'tanggal_pengembalian'
+            // 1. Update tanggal pengembalian di tabel peminjaman
             $peminjaman->update([
-                'tanggal_pengembalian' => now()
+                'tanggal_pengembalian' => $hari_ini
             ]);
 
             // 2. Tambahkan stok buku kembali
-            $buku = $peminjaman->buku; 
+            $buku = $peminjaman->buku;
             if ($buku) {
                 $buku->increment('stok_buku');
             } else {
                 throw new \Exception('Data buku tidak ditemukan.');
             }
 
-            DB::commit(); // Simpan semua perubahan jika sukses
+            // 3. JIKA ADA DENDA, buat record baru di tabel denda
+            if ($total_denda > 0) {
+                // Pastikan Anda sudah import model Denda di atas controller
+                // use App\Models\Denda;
+                Denda::create([
+                    'peminjaman_id' => $peminjaman->peminjaman_id,
+                    'jumlah' => $total_denda,         // <-- CORRECTED: Use 'jumlah'
+                    'status' => 'belum lunas',        // <-- CORRECTED: Use 'status' and the value from your screenshot
+                ]);
+            }
+
+            DB::commit();
 
         } catch (\Exception $e) {
-            DB::rollBack(); // Batalkan semua jika ada error
-            return back()->with('error', 'Gagal mengembalikan buku: ' . $e->getMessage());
+            DB::rollBack();
+            // Optional: Log the error
+            // \Log::error('Error returning book: ' . $e->getMessage());
+            return back()->with('error', 'Gagal mengembalikan buku: Terjadi kesalahan.'); // Simplified error message
         }
 
-        // Kembali ke halaman sebelumnya dengan pesan sukses
-        return back()->with('success', 'Buku telah berhasil dikembalikan dan stok telah diperbarui.');
-    }
+        $pesan_sukses = 'Buku telah berhasil dikembalikan dan stok telah diperbarui.';
+        if ($total_denda > 0) {
+            $pesan_sukses .= ' Denda sebesar Rp ' . number_format($total_denda, 0, ',', '.') . ' telah dicatat.';
+        }
 
+        return back()->with('success', $pesan_sukses);
+    }
     /**
      * Halaman untuk cetak nota (placeholder).
      */
