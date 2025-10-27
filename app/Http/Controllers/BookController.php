@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Buku;
+use App\Models\KategoriBuku;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -37,9 +38,16 @@ class BookController extends Controller
 
 
     // tambah buku baru
+    /**
+     * Menampilkan form untuk menambah buku baru.
+     */
     public function create()
     {
-        return view('books.create');
+        // Ambil semua kategori buku dari database
+        $kategori = KategoriBuku::orderBy('nama_kategori', 'asc')->get(); // Gunakan $kategori agar konsisten dengan view edit Anda
+
+        // Kirim data kategori ke view 'books.create'
+        return view('books.create', compact('kategori')); // Kirim variabel $kategori
     }
 
     public function store(Request $request)
@@ -60,7 +68,7 @@ class BookController extends Controller
 
     public function edit(Buku $book)
     {
-        $kategori = \App\Models\KategoriBuku::all();
+        $kategori = KategoriBuku::all();
         return view('books.edit', [
             'book' => $book,
             'kategori' => $kategori

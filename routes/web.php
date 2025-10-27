@@ -64,7 +64,7 @@ Route::middleware(['auth', 'permission:borrow_books']) // Sesuaikan permission j
     ->name('peminjaman.cetak');
 
 //bayar sekarang
-Route::post('/peminjaman/{peminjaman}/bayar', [PaymentController::class, 'proses'])->name('pembayaran.proses');
+//Route::post('/peminjaman/{peminjaman}/bayar', [PaymentController::class, 'proses'])->name('pembayaran.proses');
 
 Route::middleware(['auth', 'permission:return_books'])->get('/returns', fn() => view('books.return'))->name('books.return');
 //Route::middleware(['auth', 'permission:manage_books'])->get('/books/manage', fn() => view('books.manage'))->name('books.manage');
