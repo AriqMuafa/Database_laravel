@@ -26,7 +26,7 @@
                             <button type="submit" class="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded">
                                 Bayar Sekarang
                             </button>
-                            <a href="{{ route('menu.peminjaman') }}" class="flex-1 bg-gray-500 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded text-center">
+                            <a href="{{ route('fines.index') }}" class="flex-1 bg-gray-500 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded text-center">
                                 Batal
                             </a>
                         </div>
