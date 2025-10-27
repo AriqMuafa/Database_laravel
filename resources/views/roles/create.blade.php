@@ -10,14 +10,14 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
             <div class="mb-6">
-                <a href="{{ route('user-roles.index') }}" class="text-blue-500 hover:text-blue-700">
+                <a href="{{ route('roles.index') }}" class="text-blue-500 hover:text-blue-700">
                     ← Back to Roles
                 </a>
             </div>
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
-                    <form action="{{ route('user-roles.store') }}" method="POST">
+                    <form action="{{ route('roles.store') }}" method="POST">
                         @csrf
 
                         {{-- Role Name --}}
@@ -86,12 +86,12 @@
 
                         {{-- Actions --}}
                         <div class="flex items-center justify-end space-x-3">
-                            <a href="{{ route('user-roles.index') }}"
+                            <a href="{{ route('roles.index') }}"
                                 class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                                 Cancel
                             </a>
                             <button type="submit"
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                class="bg-blue-700 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                 Create Role
                             </button>
                         </div>
