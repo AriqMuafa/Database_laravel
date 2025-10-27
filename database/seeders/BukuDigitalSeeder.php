@@ -16,6 +16,8 @@ class BukuDigitalSeeder extends Seeder
         BukuDigital::create([
             'buku_id' => $buku->buku_id,
             'file_url' => 'https://example.com/ebooks/dasar-pemrograman.pdf',
+            'format_file' => 'PDF',
+            'ukuran_file' => 2.5,
             'hak_akses' => 'locked'
         ]);
     }
