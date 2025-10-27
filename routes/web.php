@@ -4,6 +4,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\DendaController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\ReservasiController;
 use Illuminate\Support\Facades\Route;
@@ -80,9 +83,35 @@ Route::middleware(['auth', 'permission:manage_categories'])->get('/categories', 
 Route::middleware(['auth', 'permission:view_members'])->get('/members', fn() => view('members.index'))->name('members.index');
 Route::middleware(['auth', 'permission:manage_expired_members'])->get('/admin/expired-members', fn() => view('admin.expired'))->name('admin.expired');
 
-//denda
-Route::middleware(['auth', 'permission:view_fines'])->get('/fines', fn() => view('fines.index'))->name('fines.index');
-Route::middleware(['auth', 'permission:manage_fines'])->get('/admin/fines', fn() => view('admin.fines'))->name('admin.fines');
+// PEMINJAMAN & DENDA (USER & ADMIN)
+Route::middleware(['auth'])->group(function () {
+
+    //user
+    Route::middleware('permission:view_fines')->group(function () {
+
+        // Halaman utama "Peminjaman Saya"
+        Route::get('/peminjaman-saya', [PeminjamanController::class, 'index'])->name('menu.peminjaman');
+        Route::get('/peminjaman-saya/fines', [PeminjamanController::class, 'finesIndex'])
+        ->name('fines.index');
+        
+        // Pembayaran Denda (Order)
+        Route::get('/peminjaman-saya/{denda}/confirm', [OrderController::class, 'confirm'])->name('orders.confirm');
+        Route::post('/peminjaman-saya/{denda}/process', [OrderController::class, 'process'])->name('orders.process');
+
+        // Status Pembayaran
+        Route::get('/peminjaman-saya/{order}/waiting', [OrderController::class, 'waiting'])->name('orders.waiting');
+        Route::get('/peminjaman-saya/{order}/check-status', [OrderController::class, 'checkStatus'])->name('orders.check-status');
+        Route::get('/peminjaman-saya/{order}/success', [OrderController::class, 'success'])->name('orders.success');
+    });
+
+    //admin
+    Route::middleware('permission:manage_fines')->group(function () {
+        Route::get('/fines/admin', [DendaController::class, 'adminIndex'])->name('fines.admin');
+        Route::post('/fines/{denda}/update-status', [DendaController::class, 'updateStatus'])->name('fines.update-status');
+        Route::delete('/fines/{denda}', [DendaController::class, 'destroy'])->name('fines.destroy');
+    });
+});
+
 
 // Rute baru untuk Admin/Pustakawan melihat semua pinjaman
 Route::get('/admin/peminjaman', [PeminjamanController::class, 'adminIndex'])
@@ -164,8 +193,12 @@ Route::get('/menu/laporan', function () {
 
 
 
+
 Route::middleware(['auth', 'permission:manage_users'])->group(function () {
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
 });
+
+// Webhook Route (no auth middleware)
+Route::post('/webhook/payment', [WebhookController::class, 'handlePayment'])->name('webhook.payment');
 
 require __DIR__.'/auth.php';
