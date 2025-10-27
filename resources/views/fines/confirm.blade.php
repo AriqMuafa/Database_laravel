@@ -20,13 +20,13 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('orders.process', $denda) }}" method="POST">
+                    <form action="{{ route('orders.process', $denda->denda_id) }}" method="POST">
                         @csrf
                         <div class="flex gap-4">
                             <button type="submit" class="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded">
                                 Bayar Sekarang
                             </button>
-                            <a href="{{ route('fines.index') }}" class="flex-1 bg-gray-500 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded text-center">
+                            <a href="{{ route('fines.index', $denda->peminjaman_id) }}" class="flex-1 bg-gray-500 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded text-center">
                                 Batal
                             </a>
                         </div>

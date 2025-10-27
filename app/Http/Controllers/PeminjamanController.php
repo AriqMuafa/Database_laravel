@@ -27,10 +27,10 @@ class PeminjamanController extends Controller
         } else {
             // 2. Ambil data peminjaman HANYA untuk anggota_id ini
             $data_peminjaman = Peminjaman::with(['buku', 'anggota']) // Tetap ambil 'anggota'
-                                ->where('anggota_id', $anggotaId)
-                                ->whereNull('tanggal_pengembalian') // Hanya yang masih dipinjam
-                                ->orderBy('tanggal_pinjam', 'asc')
-                                ->get();
+                ->where('anggota_id', $anggotaId)
+                ->whereNull('tanggal_pengembalian') // Hanya yang masih dipinjam
+                ->orderBy('tanggal_pinjam', 'asc')
+                ->get();
         }
 
         // 3. Hitung denda (logika ini sama seperti sebelumnya)
@@ -62,9 +62,9 @@ class PeminjamanController extends Controller
 
         // Ambil semua data peminjaman YANG BELUM DIKEMBALIKAN
         $data_peminjaman = Peminjaman::with(['anggota', 'buku'])
-                            ->whereNull('tanggal_pengembalian') 
-                            ->orderBy('tanggal_pinjam', 'asc')
-                            ->get();
+            ->whereNull('tanggal_pengembalian')
+            ->orderBy('tanggal_pinjam', 'asc')
+            ->get();
 
         // Hitung denda untuk setiap peminjaman
         foreach ($data_peminjaman as $pinjam) {
@@ -84,7 +84,7 @@ class PeminjamanController extends Controller
         // Kirim data ke view 'admin.peminjaman'
         return view('admin.peminjaman', compact('data_peminjaman'));
     }
-    
+
     /**
      * Proses untuk mengembalikan buku dan menambah stok.
      */
@@ -163,7 +163,11 @@ class PeminjamanController extends Controller
      */
     public function cetak(Peminjaman $peminjaman)
     {
-        return "Halaman Cetak Nota untuk Peminjaman ID: " . $peminjaman->id;
+        // Pastikan relasi dengan buku & anggota sudah di-load
+        $peminjaman->load(['buku', 'anggota', 'denda']);
+
+        // Kirim data ke view books/borrow_cetak.blade.php
+        return view('books.borrow_cetak', compact('peminjaman'));
     }
 
 

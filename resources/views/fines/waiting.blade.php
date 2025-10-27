@@ -31,4 +31,12 @@
                         <a href="{{ $order->payment_url }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded">
                             Bayar Sekarang
                         </a>
-                        <a href="{{ route('menu.peminjaman') }}" class="bg-gray-500 hover:
+                        <a href="{{ route('menu.peminjaman') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded">
+                            Kembali
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>

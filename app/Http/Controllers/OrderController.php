@@ -18,10 +18,15 @@ class OrderController extends Controller
     public function process(Denda $denda)
     {
         $expiredHours = (int) config('services.payment.expired_hours', 24);
+        \Log::info('Debug Denda', [
+            'denda_object' => $denda->toArray(),
+            'getKey' => $denda->getKey(),
+            'keyName' => $denda->getKeyName(),
+        ]);
 
         $order = Order::create([
             'user_id' => auth()->id(),
-            'denda_id' => $denda->denda_id,
+            'denda_id' => $denda->getKey(),
             'order_number' => 'ORD-' . strtoupper(Str::random(10)),
             'amount' => $denda->jumlah,
             'payment_status' => 'pending',
@@ -42,30 +47,49 @@ class OrderController extends Controller
                         'expired_duration' => $expiredHours,
                         'callback_url' => route('fines.success', $order),
                         'metadata' => [
-                            'denda_id' => $denda->denda_id,
+                            'denda_id' => $denda->getkey(),
                             'user_id' => auth()->id(),
                         ],
                     ]);
+            // \Log::info('Response dari payment gateway:', $response->json());
+            // \Log::info('Status:', ['status_code' => $response->status()]);
+
+            // dd($response->json(), $response->status());
+
 
             if ($response->successful()) {
                 $data = $response->json();
+
+                // Pastikan data valid
                 $order->update([
-                    'va_number' => $data['data']['va_number'],
-                    'payment_url' => $data['data']['payment_url'],
+                    'va_number' => $data['data']['va_number'] ?? null,
+                    'payment_url' => $data['data']['payment_url'] ?? null,
                 ]);
 
-                return redirect()->route('fines.waiting', $order);
-            }
-            dd($response->json());
+                // Redirect ke halaman menunggu pembayaran
+                return redirect()->route('fines.waiting', $order)
+                    ->with('success', 'Pembayaran berhasil dibuat. Silakan lanjutkan ke gateway.');
+            } else {
+                // Simpan log agar bisa dicek di storage/logs/laravel.log
+                \Log::error('Payment gateway error response:', [
+                    'status' => $response->status(),
+                    'body' => $response->json(),
+                ]);
 
-            $order->update(['payment_status' => 'failed']);
-            return redirect()->route('menu.peminjaman')
-                ->with('error', 'Gagal membuat pembayaran. Silakan coba lagi.');
+                $order->update(['payment_status' => 'failed']);
+
+                return redirect()->route('menu.peminjaman')
+                    ->with('error', 'Gagal membuat pembayaran. Silakan coba lagi nanti.');
+            }
+
         } catch (\Exception $e) {
+            \Log::error('Payment gateway exception:', ['message' => $e->getMessage()]);
             $order->update(['payment_status' => 'failed']);
+
             return redirect()->route('menu.peminjaman')
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+
     }
 
     public function waiting(Order $order)
