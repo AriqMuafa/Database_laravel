@@ -52,20 +52,30 @@ class BookController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        // 1. Validasi data input (lebih spesifik)
+        $validatedData = $request->validate([
             'judul' => 'required|string|max:255',
             'pengarang' => 'required|string|max:255',
-            'tahun_terbit' => 'required|integer',
+            // Tambahkan aturan digits, min, max
+            'tahun_terbit' => 'required|integer|digits:4|min:1000|max:' . date('Y'),
             'sinopsis' => 'nullable|string',
-            'stok_buku' => 'required|integer',
+            // Tambahkan aturan min
+            'stok_buku' => 'required|integer|min:0',
             'kategori_id' => 'required|exists:kategori_buku,kategori_id',
         ]);
 
-        Buku::create($request->all());
-
-        return redirect()->route('books.manage')->with('success', 'Buku berhasil ditambahkan!');
+        // 2. Buat record baru (gunakan try...catch)
+        try {
+            // Gunakan $validatedData agar hanya data tervalidasi yang disimpan
+            Buku::create($validatedData);
+            return redirect()->route('books.manage')->with('success', 'Buku berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            // Jika terjadi error saat menyimpan
+            \Log::error('Error adding book: ' . $e->getMessage()); // Catat error di log
+            // Kembali ke form dengan input lama dan pesan error
+            return back()->withInput()->with('error', 'Gagal menambahkan buku. Silakan coba lagi.');
+        }
     }
-
     public function edit(Buku $book)
     {
         $kategori = KategoriBuku::all();
