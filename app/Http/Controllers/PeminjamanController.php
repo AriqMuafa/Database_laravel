@@ -28,7 +28,6 @@ class PeminjamanController extends Controller
             // 2. Ambil data peminjaman HANYA untuk anggota_id ini
             $data_peminjaman = Peminjaman::with(['buku', 'anggota']) // Tetap ambil 'anggota'
                 ->where('anggota_id', $anggotaId)
-                ->whereNull('tanggal_pengembalian') // Hanya yang masih dipinjam
                 ->orderBy('tanggal_pinjam', 'asc')
                 ->get();
         }
@@ -85,12 +84,28 @@ class PeminjamanController extends Controller
         return view('admin.peminjaman', compact('data_peminjaman'));
     }
 
-    /**
-     * Proses untuk mengembalikan buku dan menambah stok.
-     */
-    /**
-     * Proses untuk mengembalikan buku, menambah stok, dan mencatat denda jika ada.
-     */
+    public function daftarAnggota()
+    {
+        // Ambil semua anggota yang punya peminjaman aktif
+        $anggota = Anggota::withCount('peminjaman')->get();
+
+        return view('members.index', compact('anggota'));
+    }
+
+    public function detailAnggota($anggota_id)
+    {
+        // Ambil data anggota
+        $anggota = Anggota::findOrFail($anggota_id);
+
+        // Ambil semua peminjaman milik anggota ini
+        $peminjaman = Peminjaman::with(['buku', 'denda'])
+            ->where('anggota_id', $anggota_id)
+            ->get();
+
+        // Kirim ke view
+        return view('members.detail', compact('anggota', 'peminjaman'));
+    }
+
     public function kembali(Peminjaman $peminjaman)
     {
         // --- AWAL PERHITUNGAN DENDA (VERSI PERBAIKAN) ---
@@ -101,18 +116,18 @@ class PeminjamanController extends Controller
 
         // Pastikan tanggal jatuh tempo valid dan set ke awal hari
         try {
-             $jatuh_tempo = Carbon::parse($peminjaman->tanggal_jatuh_tempo)->startOfDay();
+            $jatuh_tempo = Carbon::parse($peminjaman->tanggal_jatuh_tempo)->startOfDay();
         } catch (\Exception $e) {
-             // Jika tanggal jatuh tempo tidak valid, anggap tidak ada denda
-             $jatuh_tempo = null;
-             \Log::error("Invalid date format for jatuh_tempo: " . $peminjaman->tanggal_jatuh_tempo); // Catat error
+            // Jika tanggal jatuh tempo tidak valid, anggap tidak ada denda
+            $jatuh_tempo = null;
+            \Log::error("Invalid date format for jatuh_tempo: " . $peminjaman->tanggal_jatuh_tempo); // Catat error
         }
 
         // Hitung denda HANYA jika tanggal valid dan hari ini sudah lewat jatuh tempo
         if ($jatuh_tempo && $hari_ini->isAfter($jatuh_tempo)) {
-             // Hitung selisih hari (gunakan parameter false agar tidak absolut, lalu ambil max 0)
-             $hari_terlambat = max(0, $jatuh_tempo->diffInDays($hari_ini, false));
-             $total_denda = $hari_terlambat * $tarif_denda_per_hari;
+            // Hitung selisih hari (gunakan parameter false agar tidak absolut, lalu ambil max 0)
+            $hari_terlambat = max(0, $jatuh_tempo->diffInDays($hari_ini, false));
+            $total_denda = $hari_terlambat * $tarif_denda_per_hari;
         }
         // --- AKHIR PERHITUNGAN DENDA ---
         try {
@@ -120,7 +135,8 @@ class PeminjamanController extends Controller
 
             // 1. Update tanggal pengembalian di tabel peminjaman
             $peminjaman->update([
-                'tanggal_pengembalian' => $hari_ini
+                'tanggal_pengembalian' => $hari_ini,
+                'status' => 'sudah dikembalikan',
             ]);
 
             // 2. Tambahkan stok buku kembali
@@ -242,10 +258,10 @@ class PeminjamanController extends Controller
                 throw new \Exception('Data buku tidak ditemukan saat pengurangan stok.');
             }
 
-            DB::commit(); 
+            DB::commit();
 
         } catch (\Exception $e) {
-            DB::rollBack(); 
+            DB::rollBack();
             return back()->with('error', 'Gagal menyimpan transaksi: ' . $e->getMessage());
         }
 
