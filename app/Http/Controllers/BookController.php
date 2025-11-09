@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Buku;
 use App\Models\KategoriBuku;
+use App\Models\Denda;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -25,6 +27,7 @@ class BookController extends Controller
                 'kategori_buku.nama_kategori'
             )
             ->get();
+
 
         return view('books.index', compact('books'));
     }
@@ -107,4 +110,23 @@ class BookController extends Controller
 
         return redirect()->route('books.manage')->with('success', 'Buku berhasil dihapus!');
     }
+
+    public function showDenda($id)
+    {
+        // 1️⃣ Ambil order berdasarkan ID dari URL
+        $order = Order::find($id);
+
+        // 2️⃣ Pastikan order ditemukan
+        if (!$order) {
+            return redirect()->back()->with('error', 'Order tidak ditemukan.');
+        }
+
+        // 3️⃣ Ambil data denda berdasarkan denda_id dari order
+        $denda = Denda::find($order->denda_id);
+
+        // 4️⃣ Kirim ke view
+        return view('books.borrow_cetak', compact('order', 'denda'));
+    }
+
+    
 }
