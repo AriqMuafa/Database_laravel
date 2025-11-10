@@ -11,7 +11,11 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('denda_id')->constrained('denda')->onDelete('cascade'); // relasi ke denda
+            
+            // 👇 PERBAIKAN DI SINI
+            // Menghubungkan 'orders.denda_id' ke 'denda.denda_id'
+            $table->foreignId('denda_id')->constrained('denda', 'denda_id')->onDelete('cascade');
+            
             $table->string('order_number')->unique();
             $table->decimal('amount', 12, 2); // jumlah denda
             $table->enum('payment_status', ['pending', 'paid', 'failed', 'expired'])->default('pending');

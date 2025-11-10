@@ -137,8 +137,14 @@ Route::middleware(['auth'])->group(function () {
             ->name('peminjaman.cetak');
 
         // Lihat Denda
-        Route::get('/peminjaman-saya/fines/{peminjaman}', [PeminjamanController::class, 'finesIndex'])
-            ->name('fines.index');
+        // DI routes/web.php
+
+        // 1. Route untuk DAFTAR semua denda (tanpa parameter)
+        Route::get('peminjaman-saya/fines', [PeminjamanController::class, 'index'])->name('fines.index');
+
+        // 2. Route untuk DETAIL denda (dengan parameter)
+        // Ubah nama route ini menjadi 'fines.show' agar lebih logis
+        Route::get('peminjaman-saya/fines/{peminjaman}', [PeminjamanController::class, 'show'])->name('fines.show');
 
         // Pembayaran Denda (Order)
         Route::get('/peminjaman-saya/{denda}/confirm', [OrderController::class, 'confirm'])

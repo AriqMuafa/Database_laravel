@@ -9,24 +9,31 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            // Master data dulu
+            // 1. Master data non-user (kategori, role, permission)
             KategoriBukuSeeder::class,
+            RoleSeeder::class,
+            PermissionSeeder::class,
+
+            // 2. Data penghubung role & permission
+            RolePermissionSeeder::class,
+
+            // 3. Buat user (yang butuh data dari RoleSeeder)
+            UserSeeder::class,
+
+            // 4. Buat data yang bergantung pada User (Anggota/Pustakawan)
             AnggotaSeeder::class,
             PustakawanSeeder::class,
 
-            // Data yang bergantung pada master data
+            // 5. Data buku (bergantung pada kategori)
             BukuSeeder::class,
             BukuDigitalSeeder::class,
 
-            // Data transaksi
+            // 6. Data transaksi (bergantung pada Anggota dan Buku)
             PeminjamanSeeder::class,
             DendaSeeder::class, // Harus setelah Peminjaman
             ReservasiSeeder::class,
 
-            RoleSeeder::class,
-            PermissionSeeder::class,
-            RolePermissionSeeder::class,
-            UserSeeder::class,
+            CreateUsersForAnggotaSeeder::class,
         ]);
     }
 }
