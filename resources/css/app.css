@@ -23,10 +23,11 @@
     align-items: center;
     gap: 20px;
     margin: 0;
-    overflow: hidden;
+    /* overflow: hidden; */
     position: fixed;
     top: 0;
     /* opacity: 0.75; */
+    /* z-index: 50; */
 }
 
 /* Konten navbar */

@@ -114,10 +114,11 @@
     <div class="navbar-container">
 
         <div class="shrink-0 flex items-center">
-            <a href="{{ route('dashboard') }}" class="logo" style="text-decoration: none; display: flex; align-items: center;">
+            <a href="{{ route('dashboard') }}" class="logo"
+                style="text-decoration: none; display: flex; align-items: center;">
                 {{-- Ganti 'images/logo.svg' dengan path logo Anda di folder 'public' --}}
                 <img src="{{ asset('img/digilib.svg') }}" alt="DigiLib Logo" class="logo-icon">
-                
+
                 {{-- 
                     PERHATIKAN: CSS Anda di .logo punya 'flex-direction: column', 
                     tapi gambar Anda 'row' (menyamping).
@@ -129,14 +130,14 @@
 
         <div class="nav-links">
             {{-- 
-                Ganti route('home') dll dengan nama route Anda yang sebenarnya.
+                Ganti route('home') dll dengan nama route Anda yang sebenarnya.c 
                 Class 'active' akan otomatis ditambahkan jika route-nya cocok.
             --}}
             <div class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-              <a href="{{ route('dashboard') }}">Home</a>
+                <a href="{{ route('dashboard') }}">Home</a>
             </div>
             <div class="divider">|</div>
-            <div class="nav-link {{ request()->routeIs('books.*') ? 'active' : '' }}">
+            <div class="nav-link {{ request()->routeIs('books.*', 'menu.buku') ? 'active' : '' }}">
                 <a href="{{ route('menu.buku') }}">Book</a>
             </div>
             <div class="divider">|</div>
@@ -150,20 +151,21 @@
         </div>
 
         <div class="hidden sm:flex sm:items-center sm:ms-6">
-            <x-dropdown align="right" width="48">
-                
+            <x-dropdown align="right" width="64">
                 {{-- Ini adalah Pemicu Dropdown (Nama, Avatar, Panah) --}}
                 <x-slot name="trigger">
                     <button class="user-profile" style="background: none; border: none; cursor: pointer;">
-                        <div class="user-name">
-                            {{ Auth::user()->name }}
-                        </div>
-                        
                         {{-- Panah Dropdown --}}
                         <div class="ms-1" style="color: white;">
                             <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                <path fill-rule="evenodd"
+                                    d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                    clip-rule="evenodd" />
                             </svg>
+                        </div>
+
+                        <div class="user-name">
+                            {{ Auth::user()->name }}
                         </div>
 
                         {{-- Avatar --}}
@@ -176,7 +178,8 @@
 
                 {{-- Ini adalah Konten Dropdown (Menu yang muncul) --}}
                 <x-slot name="content">
-                    <div style="padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px;">
+                    <div
+                        style="padding: 10px 15px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; background-color: #f9f9f9;">
                         <div class="user-avatar" style="width: 40px; height: 40px;">
                             {{-- Avatar kecil di dalam dropdown --}}
                         </div>
@@ -201,9 +204,9 @@
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault();
+                            onclick="event.preventDefault();
                                             this.closest('form').submit();"
-                                style="color: #EF4444;"> {{-- Warna merah --}}
+                            style="color: #EF4444;"> {{-- Warna merah --}}
                             <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i> {{-- Contoh ikon --}}
                             {{ __('Log Out') }}
                         </x-dropdown-link>
@@ -214,17 +217,20 @@
 
         {{-- Ini adalah Hamburger Menu untuk Mobile (Anda bisa styling nanti) --}}
         <div class="-me-2 flex items-center sm:hidden">
-            <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+            <button @click="open = ! open"
+                class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
                 <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                    <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    <path :class="{ 'hidden': !open, 'inline-flex': open }" class="hidden" stroke-linecap="round"
+                        stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
     </div>
 
     {{-- Ini adalah Konten Dropdown Mobile (Anda bisa styling nanti) --}}
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+    <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             {{-- INI PERBAIKANNYA --}}
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
