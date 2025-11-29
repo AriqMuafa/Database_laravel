@@ -208,26 +208,50 @@ Route::middleware(['auth', 'permission:manage_reservations'])->group(function ()
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'permission:access_digital_books'])
-    ->get('/digital-books', [BukuDigitalController::class, 'index'])
-    ->name('digital.index');
-Route::middleware(['auth', 'permission:access_digital_books'])->group(function () {
+// ==========================
+// Buku Digital (CRUD & Akses)
+// ==========================
+Route::middleware(['auth'])->group(function () {
 
-    // Halaman detail buku digital
-    Route::get(
-        '/digital-books/{id}',
-        [BukuDigitalController::class, 'show']
-    )
+    // -------------------------- CREATE --------------------------
+    Route::get('/digital-books/create', [BukuDigitalController::class, 'create'])
+        ->middleware('permission:create_digital_books')
+        ->name('digital.create');
+
+    Route::post('/digital-books', [BukuDigitalController::class, 'store'])
+        ->middleware('permission:create_digital_books')
+        ->name('digital.store');
+
+    // -------------------------- EDIT --------------------------
+    Route::get('/digital-books/{id}/edit', [BukuDigitalController::class, 'edit'])
+        ->middleware('permission:edit_digital_books')
+        ->name('digital.edit');
+
+    Route::put('/digital-books/{id}', [BukuDigitalController::class, 'update'])
+        ->middleware('permission:edit_digital_books')
+        ->name('digital.update');
+
+    // -------------------------- DELETE --------------------------
+    Route::delete('/digital-books/{id}', [BukuDigitalController::class, 'destroy'])
+        ->middleware('permission:delete_digital_books')
+        ->name('digital.destroy');
+
+    // -------------------------- LIST --------------------------
+    Route::get('/digital-books', [BukuDigitalController::class, 'index'])
+        ->middleware('permission:access_digital_books')
+        ->name('digital.index');
+
+    // -------------------------- DETAIL --------------------------
+    Route::get('/digital-books/{id}', [BukuDigitalController::class, 'show'])
+        ->middleware('permission:access_digital_books')
         ->name('digital.show');
 
-    // Download file digital (opsional tergantung hak akses)
-    Route::get(
-        '/digital-books/{id}/download',
-        [BukuDigitalController::class, 'download']
-    )
+    // -------------------------- DOWNLOAD --------------------------
+    Route::get('/digital-books/{id}/download', [BukuDigitalController::class, 'download'])
+        ->middleware('permission:access_digital_books')
         ->name('digital.download');
-
 });
+
 
 
 Route::middleware(['auth', 'permission:view_reports'])

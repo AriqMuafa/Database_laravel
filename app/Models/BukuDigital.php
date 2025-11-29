@@ -21,7 +21,6 @@ class BukuDigital extends Model
         'buku_id',
         'file_url',
         'hak_akses',
-        'format',
         'cover',
         'deskripsi',
         'is_downloadable',
