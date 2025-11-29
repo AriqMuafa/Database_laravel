@@ -9,6 +9,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\ReservasiController;
+use App\Http\Controllers\BukuDigitalController;
+
 // use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
@@ -207,7 +209,26 @@ Route::middleware(['auth', 'permission:manage_reservations'])->group(function ()
 */
 
 Route::middleware(['auth', 'permission:access_digital_books'])
-    ->get('/digital-books', fn() => view('digital.index'))->name('digital.index');
+    ->get('/digital-books', [BukuDigitalController::class, 'index'])
+    ->name('digital.index');
+Route::middleware(['auth', 'permission:access_digital_books'])->group(function () {
+
+    // Halaman detail buku digital
+    Route::get(
+        '/digital-books/{id}',
+        [BukuDigitalController::class, 'show']
+    )
+        ->name('digital.show');
+
+    // Download file digital (opsional tergantung hak akses)
+    Route::get(
+        '/digital-books/{id}/download',
+        [BukuDigitalController::class, 'download']
+    )
+        ->name('digital.download');
+
+});
+
 
 Route::middleware(['auth', 'permission:view_reports'])
     ->get('/admin/reports', fn() => view('admin.reports'))->name('admin.reports');
