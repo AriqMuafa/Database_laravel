@@ -19,6 +19,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', fn() => view('welcome'))->name('guest.home');
+Route::get('/about-us', fn() => view('about'))->name('about');
+Route::get('/contact', function () {
+    return view('contact');
+})->name('contact');
 Route::get('/dashboard', fn() => view('dashboard'))
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
