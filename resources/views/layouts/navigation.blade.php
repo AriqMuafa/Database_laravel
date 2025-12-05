@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-blue-600 border-b border-blue-700">
+<nav x-data="{ open: false }" class="bg-[#4C72AF] relative z-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
 
@@ -15,7 +15,7 @@
             <div class="hidden sm:flex sm:items-center sm:space-x-8">
 
                 <a href="{{ route('dashboard') }}"
-                    class="text-white hover:text-blue-200 px-3 py-2 rounded-md font-medium text-sm transition duration-150 ease-in-out {{ request()->routeIs('dashboard') ? 'bg-blue-700' : '' }}">
+                    class="text-white hover:text-blue-200 px-3 py-2 rounded-md font-medium text-sm transition duration-150 ease-in-out {{ request()->routeIs('dashboard') ? 'bg-[#6187B7]' : '' }}">
                     Home
                 </a>
 
@@ -93,8 +93,9 @@
                 <button @click="open = !open"
                     class="inline-flex items-center justify-center p-2 rounded-md text-blue-100 hover:text-white hover:bg-blue-500 focus:outline-none focus:bg-blue-500 focus:text-white transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex" stroke-linecap="round"
-                            stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex"
+                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{ 'hidden': !open, 'inline-flex': open }" class="hidden" stroke-linecap="round"
                             stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
