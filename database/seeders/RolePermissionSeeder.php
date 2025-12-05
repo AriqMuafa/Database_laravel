@@ -31,7 +31,10 @@ class RolePermissionSeeder extends Seeder
                 'view_fines',
                 'manage_fines',
                 'access_digital_books',
-                'manage_expired_members'
+                'create_digital_books',  
+                'edit_digital_books',    
+                'delete_digital_books',  
+                'manage_expired_members',
             ])->pluck('id')
         );
 

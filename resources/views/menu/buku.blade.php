@@ -7,24 +7,63 @@
 
     <div class="py-12">
         <div class="max-w-6xl mx-auto sm:px-6 lg:px-8 mt-6">
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                <ul class="list-disc ml-6 space-y-3">
+
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow">
+
+                {{-- GRID MENU --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
                     @if(auth()->user()->hasPermission('view_books'))
-                        <li><a href="{{ route('books.index') }}" class="text-gray-800 dark:text-gray-100 hover:underline">Lihat Buku</a></li>
+                        <a href="{{ route('books.index') }}"
+                           class="group p-6 rounded-xl bg-gray-50 dark:bg-gray-700 
+                                  shadow hover:shadow-lg transition-all flex flex-col items-center text-center
+                                  hover:bg-blue-500 hover:text-white">
+                            <div class="text-4xl mb-3 group-hover:scale-110 transition">📚</div>
+                            <div class="font-semibold text-lg">Lihat Buku</div>
+                        </a>
                     @endif
+
                     @if(auth()->user()->hasPermission('borrow_books'))
-                        <li><a href="{{ route('books.borrow') }}" class="text-gray-800 dark:text-gray-100 hover:underline">Pinjam Buku</a></li>
+                        <a href="{{ route('books.borrow') }}"
+                           class="group p-6 rounded-xl bg-gray-50 dark:bg-gray-700 
+                                  shadow hover:shadow-lg transition-all flex flex-col items-center text-center
+                                  hover:bg-blue-500 hover:text-white">
+                            <div class="text-4xl mb-3 group-hover:scale-110 transition">📖</div>
+                            <div class="font-semibold text-lg">Pinjam Buku</div>
+                        </a>
                     @endif
+
                     @if(auth()->user()->hasPermission('return_books'))
-                        <li><a href="{{ route('books.return') }}" class="text-gray-800 dark:text-gray-100 hover:underline">Pengembalian Buku</a></li>
+                        <a href="{{ route('books.return') }}"
+                           class="group p-6 rounded-xl bg-gray-50 dark:bg-gray-700 
+                                  shadow hover:shadow-lg transition-all flex flex-col items-center text-center
+                                  hover:bg-blue-500 hover:text-white">
+                            <div class="text-4xl mb-3 group-hover:scale-110 transition">🔄</div>
+                            <div class="font-semibold text-lg">Pengembalian Buku</div>
+                        </a>
                     @endif
+
                     @if(auth()->user()->hasPermission('reserve_books'))
-                        <li><a href="{{ route('reservations.index') }}" class="text-gray-800 dark:text-gray-100 hover:underline">Reservasi Buku</a></li>
+                        <a href="{{ route('reservations.index') }}"
+                           class="group p-6 rounded-xl bg-gray-50 dark:bg-gray-700 
+                                  shadow hover:shadow-lg transition-all flex flex-col items-center text-center
+                                  hover:bg-blue-500 hover:text-white">
+                            <div class="text-4xl mb-3 group-hover:scale-110 transition">📌</div>
+                            <div class="font-semibold text-lg">Reservasi Buku</div>
+                        </a>
                     @endif
+
                     @if(auth()->user()->hasPermission('access_digital_books'))
-                        <li><a href="{{ route('digital.index') }}" class="text-gray-800 dark:text-gray-100 hover:underline">Akses Buku Digital</a></li>
+                        <a href="{{ route('digital.index') }}"
+                           class="group p-6 rounded-xl bg-gray-50 dark:bg-gray-700 
+                                  shadow hover:shadow-lg transition-all flex flex-col items-center text-center
+                                  hover:bg-blue-500 hover:text-white">
+                            <div class="text-4xl mb-3 group-hover:scale-110 transition">💻</div>
+                            <div class="font-semibold text-lg">Akses Buku Digital</div>
+                        </a>
                     @endif
-                </ul>
+                </div>
+
             </div>
         </div>
     </div>
