@@ -14,6 +14,8 @@
         url('public/img/texture.svg');
     background-repeat: repeat;
     background-size: cover;
+    /* position: relative;
+    z-index: 0; */
 }
 
 .dashboard-container {
