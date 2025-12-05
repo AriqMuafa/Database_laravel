@@ -10,6 +10,7 @@ use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\BukuDigitalController;
+use App\Http\Controllers\ExpiredMemberController;
 
 // use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
@@ -120,8 +121,14 @@ Route::middleware(['auth', 'permission:view_members'])->group(function () {
 });
 
 
-Route::middleware(['auth', 'permission:manage_expired_members'])
-    ->get('/admin/expired-members', fn() => view('admin.expired'))->name('admin.expired');
+Route::middleware(['auth', 'permission:manage_expired_members'])->group(function () {
+    // Rute GET untuk menampilkan daftar anggota kadaluarsa (menggantikan closure lama)
+    Route::get('/admin/expired-members', [ExpiredMemberController::class, 'index'])->name('admin.expired');
+
+    // Rute DELETE untuk aksi penghapusan anggota kadaluarsa
+    Route::delete('/admin/expired-members/{anggota}', [ExpiredMemberController::class, 'destroy'])->name('admin.expired.destroy');
+});
+
 
 /*
 |--------------------------------------------------------------------------

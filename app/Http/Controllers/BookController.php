@@ -11,25 +11,44 @@ use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
-    // tampilkan daftar buku
-    public function index()
+    /**
+     * Menampilkan daftar buku dengan fitur pencarian, filter kategori, dan pagination.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
+     */
+    public function index(Request $request)
     {
-        // ambil data buku + nama kategori
-        $books = DB::table('buku')
-            ->join('kategori_buku', 'buku.kategori_id', '=', 'kategori_buku.kategori_id')
-            ->select(
-                'buku.buku_id',
-                'buku.judul',
-                'buku.pengarang',
-                'buku.tahun_terbit',
-                'buku.sinopsis',
-                'buku.stok_buku',
-                'kategori_buku.nama_kategori'
-            )
-            ->get();
+        // 1. Ambil semua kategori untuk ditampilkan di filter dropdown (penting!)
+        $kategori = KategoriBuku::orderBy('nama_kategori', 'asc')->get();
 
+        // 2. Ambil query parameter
+        $searchQuery = $request->input('search');
+        $categoryFilter = $request->input('category'); // Parameter baru untuk filter kategori
 
-        return view('books.index', compact('books'));
+        // 3. Mulai query dengan eager loading relasi kategori
+        $booksQuery = Buku::with('kategori');
+
+        // 4. Terapkan filter Kategori (NEW)
+        if ($categoryFilter) {
+            $booksQuery->where('kategori_id', $categoryFilter);
+        }
+
+        // 5. Terapkan filter Pencarian
+        if ($searchQuery) {
+            // Gunakan closure untuk memastikan filter pencarian TIDAK mengganggu filter kategori
+            $booksQuery->where(function ($query) use ($searchQuery) {
+                $query->where('judul', 'like', '%' . $searchQuery . '%')
+                      ->orWhere('pengarang', 'like', '%' . $searchQuery . '%')
+                      ->orWhere('sinopsis', 'like', '%' . $searchQuery . '%');
+            });
+        }
+
+        // 6. Ambil hasilnya dengan pagination
+        // Menggunakan withQueryString() agar semua parameter filter dan pencarian tetap ada
+        $books = $booksQuery->orderBy('judul', 'asc')->paginate(12)->withQueryString();
+
+        return view('books.index', compact('books', 'searchQuery', 'kategori', 'categoryFilter'));
     }
 
     // manage book
@@ -47,10 +66,10 @@ class BookController extends Controller
     public function create()
     {
         // Ambil semua kategori buku dari database
-        $kategori = KategoriBuku::orderBy('nama_kategori', 'asc')->get(); // Gunakan $kategori agar konsisten dengan view edit Anda
+        $kategori = KategoriBuku::orderBy('nama_kategori', 'asc')->get();
 
         // Kirim data kategori ke view 'books.create'
-        return view('books.create', compact('kategori')); // Kirim variabel $kategori
+        return view('books.create', compact('kategori'));
     }
 
     public function store(Request $request)
