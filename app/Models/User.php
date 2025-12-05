@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Models;
+
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Role;
@@ -72,5 +74,10 @@ class User extends Authenticatable
     public function anggota()
     {
         return $this->hasOne(Anggota::class, 'user_id', 'id');
+    }
+
+    public function pustakawan()
+    {
+        return $this->hasOne(Pustakawan::class); // Laravel otomatis mencari user_id
     }
 }
