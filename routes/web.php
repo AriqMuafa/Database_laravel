@@ -107,8 +107,12 @@ Route::middleware(['auth', 'permission:manage_categories'])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'permission:view_members'])
-    ->get('/members', fn() => view('members.index'))->name('members.index');
+
+Route::middleware(['auth', 'permission:view_members'])->group(function () {
+    Route::get('/members', [PeminjamanController::class, 'daftarAnggota'])->name('members.index');
+    Route::get('/members/{anggota}', [PeminjamanController::class, 'detailAnggota'])->name('members.detail');
+});
+
 
 Route::middleware(['auth', 'permission:manage_expired_members'])
     ->get('/admin/expired-members', fn() => view('admin.expired'))->name('admin.expired');

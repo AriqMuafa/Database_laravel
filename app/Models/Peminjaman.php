@@ -23,7 +23,8 @@ class Peminjaman extends Model
         'tanggal_pinjam',
         'tanggal_jatuh_tempo',
         'tanggal_pengembalian',
-        'peminjaman_id'
+        'peminjaman_id',
+        'status'
     ];
 
     protected $casts = [
