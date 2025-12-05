@@ -167,6 +167,7 @@ Route::middleware(['auth'])->group(function () {
     // ----------------------- ADMIN -----------------------
     Route::middleware('permission:manage_fines')->group(function () {
         Route::get('/fines/admin', [DendaController::class, 'adminIndex'])->name('fines.admin');
+        Route::post('/fines/{denda}/bayar', [DendaController::class, 'prosesPembayaran'])->name('fines.bayar');
         Route::post('/fines/{denda}/update-status', [DendaController::class, 'updateStatus'])->name('fines.update-status');
         Route::delete('/fines/{denda}', [DendaController::class, 'destroy'])->name('fines.destroy');
     });
