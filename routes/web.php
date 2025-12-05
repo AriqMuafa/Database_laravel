@@ -11,6 +11,7 @@ use App\Http\Controllers\PeminjamanController;
 use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\BukuDigitalController;
 use App\Http\Controllers\ExpiredMemberController;
+use App\Http\Controllers\ReportController;
 
 // use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
@@ -263,8 +264,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 Route::middleware(['auth', 'permission:view_reports'])
-    ->get('/admin/reports', fn() => view('admin.reports'))->name('admin.reports');
-
+    ->get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports');
 Route::middleware(['auth', 'permission:register_member'])
     ->get('/register-member', fn() => view('guest.register'))->name('register.member');
 
