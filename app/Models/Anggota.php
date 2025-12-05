@@ -24,6 +24,9 @@ class Anggota extends Model
         'tanggal_daftar',
         'user_id',
     ];
+     protected $dates = [
+        'tanggal_daftar',
+    ];
 
     // Relasi: Satu Anggota bisa memiliki banyak Peminjaman
     public function peminjaman()
