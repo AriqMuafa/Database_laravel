@@ -9,7 +9,7 @@ class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        Permission::insert([
+        $permissions = [
             // Book related
             ['name' => 'view_books', 'display_name' => 'Lihat Buku', 'group' => 'book'],
             ['name' => 'borrow_books', 'display_name' => 'Pinjam Buku', 'group' => 'book'],
@@ -22,22 +22,35 @@ class PermissionSeeder extends Seeder
             ['name' => 'view_members', 'display_name' => 'Lihat Daftar Anggota', 'group' => 'user'],
             ['name' => 'manage_expired_members', 'display_name' => 'Kelola Anggota Kadaluarsa', 'group' => 'user'],
 
-            //Denda
+            // Denda
             ['name' => 'view_fines', 'display_name' => 'Lihat Denda', 'group' => 'fine'],
             ['name' => 'manage_fines', 'display_name' => 'Kelola Denda', 'group' => 'fine'],
 
-            //Reservasi
+            // Reservasi
             ['name' => 'reserve_books', 'display_name' => 'Reservasi Buku', 'group' => 'reservation'],
             ['name' => 'manage_reservations', 'display_name' => 'Kelola Reservasi', 'group' => 'reservation'],
 
-            //Buku Digital
+            // Buku Digital — CRUD lengkap
             ['name' => 'access_digital_books', 'display_name' => 'Akses Buku Digital', 'group' => 'ebook'],
+            ['name' => 'create_digital_books', 'display_name' => 'Tambah Buku Digital', 'group' => 'ebook'],
+            ['name' => 'edit_digital_books', 'display_name' => 'Edit Buku Digital', 'group' => 'ebook'],
+            ['name' => 'delete_digital_books', 'display_name' => 'Hapus Buku Digital', 'group' => 'ebook'],
 
-            // Reports
+            // Laporan
             ['name' => 'view_reports', 'display_name' => 'Lihat Laporan', 'group' => 'report'],
 
-            //Kelola seeder
+            // Roles
             ['name' => 'manage_roles', 'display_name' => 'Kelola Role', 'group' => 'role'],
-        ]);
+        ];
+
+        foreach ($permissions as $perm) {
+            Permission::updateOrInsert(
+                ['name' => $perm['name']],  // cek berdasarkan name
+                [                           // jika ada → update
+                    'display_name' => $perm['display_name'],
+                    'group' => $perm['group'],
+                ]
+            );
+        }
     }
 }

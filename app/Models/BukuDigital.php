@@ -21,6 +21,12 @@ class BukuDigital extends Model
         'buku_id',
         'file_url',
         'hak_akses',
+        'cover',
+        'deskripsi',
+        'is_downloadable',
+        'size',
+        'views',
+        'watermarked_file_url',
     ];
 
     // Relasi: Satu BukuDigital milik satu Buku
