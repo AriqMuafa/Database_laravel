@@ -55,6 +55,12 @@ class User extends Authenticatable
     {
         return $this->role?->name ?? 'No Role';
     }
+
+    public function hasRole($roleName)
+    {
+        return $this->getRoleName() === $roleName;
+    }
+
     // Helper methods for role checking
     public function isAdmin(): bool
     {
@@ -79,5 +85,11 @@ class User extends Authenticatable
     public function pustakawan()
     {
         return $this->hasOne(Pustakawan::class); // Laravel otomatis mencari user_id
+    }
+
+    public function reviews()
+    {
+        // Satu user bisa menulis BANYAK ulasan
+        return $this->hasMany(Review::class);
     }
 }

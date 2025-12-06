@@ -8,10 +8,12 @@ use App\Http\Controllers\DendaController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PeminjamanController;
+use App\Http\Controllers\PengembalianController; // Dari Current
 use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\BukuDigitalController;
-use App\Http\Controllers\ExpiredMemberController;
-use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReviewController; // Dari Current
+use App\Http\Controllers\ExpiredMemberController; // Dari Incoming
+use App\Http\Controllers\ReportController; // Dari Incoming
 
 // use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
@@ -24,9 +26,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => view('welcome'))->name('guest.home');
 Route::get('/about-us', fn() => view('about'))->name('about');
-Route::get('/contact', function () {
-    return view('contact');
-})->name('contact');
+Route::get('/contact', fn() => view('contact'))->name('contact');
+
 Route::get('/dashboard', fn() => view('dashboard'))
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
@@ -62,41 +63,13 @@ Route::middleware(['auth', 'permission:manage_roles'])->group(function () {
         ]);
 });
 
+/*
+|--------------------------------------------------------------------------
+| BUKU & PEMINJAMAN
+|--------------------------------------------------------------------------
+*/
 
-//buku
-Route::middleware(['auth', 'permission:view_books'])->get('/books', [BookController::class, 'index'])->name('books.index');
-// Rute untuk menampilkan halaman Transaksi Peminjaman (yang kita buat)
-Route::middleware(['auth', 'permission:borrow_books'])
-    ->get('/borrow', [PeminjamanController::class, 'index'])
-    ->name('books.borrow');
-
-// 1. Rute untuk menampilkan form "Transaksi Baru"
-Route::middleware(['auth', 'permission:borrow_books']) // Sesuaikan permission jika perlu
-    ->get('/borrow/create', [PeminjamanController::class, 'create'])
-    ->name('peminjaman.create');
-
-// 2. Rute untuk memproses data form (menyimpan)
-Route::middleware(['auth', 'permission:borrow_books']) // Sesuaikan permission jika perlu
-    ->post('/borrow', [PeminjamanController::class, 'store'])
-    ->name('peminjaman.store');
-
-// Rute untuk tombol "Pengembalian"
-Route::middleware(['auth', 'permission:return_books']) // Sesuaikan permission jika perlu
-    ->post('/borrow/return/{peminjaman}', [PeminjamanController::class, 'kembali'])
-    ->name('peminjaman.kembali');
-
-// Rute untuk tombol "Cetak Nota"
-Route::middleware(['auth', 'permission:borrow_books']) // Sesuaikan permission jika perlu
-    ->get('/borrow/cetak/{peminjaman}', [PeminjamanController::class, 'cetak'])
-    ->name('peminjaman.cetak');
-
-//bayar sekarang
-//Route::post('/peminjaman/{peminjaman}/bayar', [PaymentController::class, 'proses'])->name('pembayaran.proses');
-
-Route::middleware(['auth', 'permission:return_books'])->get('/returns', fn() => view('books.return'))->name('books.return');
-//Route::middleware(['auth', 'permission:manage_books'])->get('/books/manage', fn() => view('books.manage'))->name('books.manage');
-
-// Buku CRUD (khusus admin & pustakawan)
+// 1. MANAJEMEN BUKU (CRUD Admin)
 Route::middleware(['auth', 'permission:manage_books'])->group(function () {
     Route::get('/books/manage', [BookController::class, 'manage'])->name('books.manage');
     Route::get('/books/create', [BookController::class, 'create'])->name('books.create');
@@ -105,6 +78,38 @@ Route::middleware(['auth', 'permission:manage_books'])->group(function () {
     Route::put('/books/{book}', [BookController::class, 'update'])->name('books.update');
     Route::delete('/books/{book}', [BookController::class, 'destroy'])->name('books.destroy');
 });
+
+// 2. KATALOG BUKU (User & Admin)
+Route::middleware(['auth', 'permission:view_books'])->group(function () {
+    Route::get('/books', [BookController::class, 'index'])->name('books.index');
+    Route::get('/book/{id}', [BookController::class, 'show'])->name('books.show');
+    // Fitur Review (Dari Current)
+    Route::post('/book/{id}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+});
+
+// 3. TRANSAKSI PEMINJAMAN (User: Pinjam & Lihat List)
+Route::middleware(['auth', 'permission:borrow_books'])->group(function () {
+    // List Peminjaman Saya (Member)
+    Route::get('/borrow', [PeminjamanController::class, 'index'])->name('books.borrow'); // INI JALUR MEMBER
+
+    // Form & Proses Pinjam Baru
+    Route::get('/borrow/create', [PeminjamanController::class, 'create'])->name('peminjaman.create');
+    Route::post('/borrow', [PeminjamanController::class, 'store'])->name('peminjaman.store');
+
+    // Cetak Nota (Bisa Member/Admin)
+    Route::get('/borrow/cetak/{peminjaman}', [PeminjamanController::class, 'cetak'])->name('peminjaman.cetak');
+});
+
+// 4. MANAJEMEN PEMINJAMAN (Admin: Lihat Semua & Proses Kembali)
+Route::middleware(['auth', 'permission:return_books'])->group(function () {
+    // List Semua Peminjaman (Admin)
+    Route::get('/admin/peminjaman', [PeminjamanController::class, 'adminIndex'])->name('admin.peminjaman.index');
+
+    // Proses Pengembalian (Menggunakan PengembalianController dari Current)
+    Route::put('/peminjaman/{id}/kembali', [PengembalianController::class, 'kembalikan'])->name('peminjaman.kembali');
+});
+
+Route::middleware(['auth', 'permission:return_books'])->get('/returns', fn() => view('books.return'))->name('books.return');
 
 Route::middleware(['auth', 'permission:manage_categories'])
     ->get('/categories', fn() => view('books.categories'))->name('books.categories');
@@ -115,25 +120,23 @@ Route::middleware(['auth', 'permission:manage_categories'])
 |--------------------------------------------------------------------------
 */
 
-
 Route::middleware(['auth', 'permission:view_members'])->group(function () {
     Route::get('/members', [PeminjamanController::class, 'daftarAnggota'])->name('members.index');
     Route::get('/members/{anggota}', [PeminjamanController::class, 'detailAnggota'])->name('members.detail');
 });
 
-
+// Menggunakan Logic INCOMING (Controller) bukan Closure lagi
 Route::middleware(['auth', 'permission:manage_expired_members'])->group(function () {
-    // Rute GET untuk menampilkan daftar anggota kadaluarsa (menggantikan closure lama)
+    // Rute GET untuk menampilkan daftar anggota kadaluarsa
     Route::get('/admin/expired-members', [ExpiredMemberController::class, 'index'])->name('admin.expired');
 
     // Rute DELETE untuk aksi penghapusan anggota kadaluarsa
     Route::delete('/admin/expired-members/{anggota}', [ExpiredMemberController::class, 'destroy'])->name('admin.expired.destroy');
 });
 
-
 /*
 |--------------------------------------------------------------------------
-| PEMINJAMAN & DENDA (USER & ADMIN)
+| DENDA & PEMBAYARAN
 |--------------------------------------------------------------------------
 */
 
@@ -141,38 +144,20 @@ Route::middleware(['auth'])->group(function () {
 
     // ----------------------- USER -----------------------
     Route::middleware('permission:view_fines')->group(function () {
-
-        // Halaman utama “Peminjaman Saya”
-        Route::get('/peminjaman-saya', [PeminjamanController::class, 'index'])
-            ->name('menu.peminjaman');
-
-        // Cetak Nota
-        Route::get('/peminjaman-saya/cetak/{peminjaman}', [PeminjamanController::class, 'cetak'])
-            ->name('peminjaman.cetak');
-
-        // Lihat Denda
-        // DI routes/web.php
-
-        // 1. Route untuk DAFTAR semua denda (tanpa parameter)
+        // Alias route untuk menu
+        Route::get('/peminjaman-saya', [PeminjamanController::class, 'index'])->name('menu.peminjaman');
         Route::get('peminjaman-saya/fines', [PeminjamanController::class, 'index'])->name('fines.index');
-
-        // 2. Route untuk DETAIL denda (dengan parameter)
-        // Ubah nama route ini menjadi 'fines.show' agar lebih logis
         Route::get('peminjaman-saya/fines/{peminjaman}', [PeminjamanController::class, 'show'])->name('fines.show');
 
-        // Pembayaran Denda (Order)
-        Route::get('/peminjaman-saya/{denda}/confirm', [OrderController::class, 'confirm'])
-            ->whereNumber('denda')->name('orders.confirm');
-        Route::post('/peminjaman-saya/{denda}/process', [OrderController::class, 'process'])
-            ->name('orders.process');
-
-        // Status Pembayaran
+        // Order & Payment
+        Route::get('/peminjaman-saya/{denda}/confirm', [OrderController::class, 'confirm'])->whereNumber('denda')->name('orders.confirm');
+        Route::post('/peminjaman-saya/{denda}/process', [OrderController::class, 'process'])->name('orders.process');
         Route::get('/peminjaman-saya/{order}/waiting', [OrderController::class, 'waiting'])->name('fines.waiting');
         Route::get('/peminjaman-saya/{order}/check-status', [OrderController::class, 'checkStatus'])->name('fines.check-status');
         Route::get('/peminjaman-saya/{order}/success', [OrderController::class, 'success'])->name('fines.success');
     });
 
-    // ----------------------- ADMIN -----------------------
+    // ADMIN: Kelola Denda
     Route::middleware('permission:manage_fines')->group(function () {
         Route::get('/fines/admin', [DendaController::class, 'adminIndex'])->name('fines.admin');
         Route::post('/fines/{denda}/bayar', [DendaController::class, 'prosesPembayaran'])->name('fines.bayar');
@@ -180,15 +165,6 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/fines/{denda}', [DendaController::class, 'destroy'])->name('fines.destroy');
     });
 });
-
-// // Rute tambahan: proses pembayaran manual
-// Route::post('/peminjaman/{peminjaman}/bayar', [PaymentController::class, 'proses'])
-//     ->name('pembayaran.proses');
-
-// Admin melihat semua peminjaman
-Route::get('/admin/peminjaman', [PeminjamanController::class, 'adminIndex'])
-    ->middleware(['permission:manage_books'])
-    ->name('admin.peminjaman.index');
 
 /*
 |--------------------------------------------------------------------------
@@ -262,9 +238,10 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-
+// Menggunakan Logic INCOMING (Controller)
 Route::middleware(['auth', 'permission:view_reports'])
     ->get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports');
+
 Route::middleware(['auth', 'permission:register_member'])
     ->get('/register-member', fn() => view('guest.register'))->name('register.member');
 
