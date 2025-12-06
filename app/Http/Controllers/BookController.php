@@ -12,81 +12,91 @@ use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
-    // tampilkan daftar buku
-    public function index()
+    /**
+     * Menampilkan daftar buku dengan fitur pencarian, filter kategori, dan pagination.
+     */
+    public function index(Request $request)
     {
-        // ambil data buku + nama kategori
-        $books = DB::table('buku')
-            ->join('kategori_buku', 'buku.kategori_id', '=', 'kategori_buku.kategori_id')
-            ->select(
-                'buku.buku_id',
-                'buku.judul',
-                'buku.cover',
-                'buku.pengarang',
-                'buku.tahun_terbit',
-                'buku.sinopsis',
-                'buku.stok_buku',
-                'kategori_buku.nama_kategori'
-            )
-            ->get();
+        // 1. Ambil semua kategori untuk filter dropdown
+        $kategori = KategoriBuku::orderBy('nama_kategori', 'asc')->get();
 
+        // 2. Ambil query parameter
+        $searchQuery = $request->input('search');
+        $categoryFilter = $request->input('category');
 
-        return view('books.index', compact('books'));
+        // 3. Mulai query dengan eager loading relasi kategori
+        $booksQuery = Buku::with('kategori');
+
+        // 4. Terapkan filter Kategori
+        if ($categoryFilter) {
+            $booksQuery->where('kategori_id', $categoryFilter);
+        }
+
+        // 5. Terapkan filter Pencarian
+        if ($searchQuery) {
+            $booksQuery->where(function ($query) use ($searchQuery) {
+                $query->where('judul', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('pengarang', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('penerbit', 'like', '%' . $searchQuery . '%') // Tambahan dari Current
+                    ->orWhere('sinopsis', 'like', '%' . $searchQuery . '%');
+            });
+        }
+
+        // 6. Ambil hasilnya dengan pagination (12 buku per halaman)
+        $books = $booksQuery->orderBy('judul', 'asc')->paginate(12)->withQueryString();
+
+        return view('books.index', compact('books', 'searchQuery', 'kategori', 'categoryFilter'));
     }
 
-    // manage book
+    // manage book (Admin List)
     public function manage()
     {
         $books = Buku::with('kategori')->get();
         return view('books.manage', compact('books'));
     }
 
-
-    // tambah buku baru
     /**
      * Menampilkan form untuk menambah buku baru.
      */
     public function create()
     {
-        // Ambil semua kategori buku dari database
-        $kategori = KategoriBuku::orderBy('nama_kategori', 'asc')->get(); // Gunakan $kategori agar konsisten dengan view edit Anda
-
-        // Kirim data kategori ke view 'books.create'
-        return view('books.create', compact('kategori')); // Kirim variabel $kategori
+        $kategori = KategoriBuku::orderBy('nama_kategori', 'asc')->get();
+        return view('books.create', compact('kategori'));
     }
 
+    /**
+     * Menyimpan buku baru (dengan Upload Gambar dari Current)
+     */
     public function store(Request $request)
     {
-        // 1. Validasi data input (lebih spesifik)
+        // 1. Validasi data (Gabungan Current & Incoming)
         $validatedData = $request->validate([
             'judul'         => 'required|string|max:255',
-            'cover'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'cover'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Fitur Current
             'pengarang'     => 'required|string|max:255',
-            'penerbit'      => 'required|string|max:255',
+            'penerbit'      => 'required|string|max:255', // Fitur Current
             'tahun_terbit'  => 'required|integer|digits:4|min:1000|max:' . date('Y'),
             'sinopsis'      => 'nullable|string',
             'stok_buku'     => 'required|integer|min:0',
             'kategori_id'   => 'required|exists:kategori_buku,kategori_id',
         ]);
 
+        // 2. Logika Upload Gambar (Dari Current)
         if ($request->hasFile('cover')) {
-            // Simpan gambar dan ambil path-nya
             $path = $request->file('cover')->store('covers', 'public');
-            // PERBAIKAN: Masukkan path gambar ke dalam array $validatedData
             $validatedData['cover'] = $path;
         }
 
-        // 2. Buat record baru (gunakan try...catch)
+        // 3. Simpan ke Database
         try {
-            // PERBAIKAN: Gunakan $validatedData yang sudah berisi path cover (jika ada)
             Buku::create($validatedData);
-
             return redirect()->route('books.manage')->with('success', 'Buku berhasil ditambahkan!');
         } catch (\Exception $e) {
             \Log::error('Error adding book: ' . $e->getMessage());
-            return back()->withInput()->with('error', 'Gagal menambahkan buku. Silakan coba lagi.');
+            return back()->withInput()->with('error', 'Gagal menambahkan buku: ' . $e->getMessage());
         }
     }
+
     public function edit(Buku $book)
     {
         $kategori = KategoriBuku::all();
@@ -96,8 +106,12 @@ class BookController extends Controller
         ]);
     }
 
+    /**
+     * Update buku (dengan Upload Gambar dari Current)
+     */
     public function update(Request $request, Buku $book)
     {
+        // 1. Validasi
         $validatedData = $request->validate([
             'judul'         => 'required|string|max:255',
             'cover'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
@@ -109,18 +123,18 @@ class BookController extends Controller
             'kategori_id'   => 'required|exists:kategori_buku,kategori_id',
         ]);
 
-        // 2. Logika Upload Gambar Baru
+        // 2. Logika Upload Gambar Baru (Dari Current)
         if ($request->hasFile('cover')) {
-            if ($book->cover && \Storage::disk('public')->exists($book->cover)) {
-                \Storage::disk('public')->delete($book->cover);
+            // Hapus gambar lama jika ada
+            if ($book->cover && Storage::disk('public')->exists($book->cover)) {
+                Storage::disk('public')->delete($book->cover);
             }
 
             // Simpan gambar baru
             $path = $request->file('cover')->store('covers', 'public');
-
-            // Masukkan path baru ke array validasi
             $validatedData['cover'] = $path;
         } else {
+            // Jangan update kolom cover jika tidak ada file baru
             unset($validatedData['cover']);
         }
 
@@ -132,8 +146,9 @@ class BookController extends Controller
 
     public function destroy(Buku $book)
     {
-        if ($book->cover && \Storage::disk('public')->exists($book->cover)) {
-            \Storage::disk('public')->delete($book->cover);
+        // Hapus file gambar cover juga (Dari Current)
+        if ($book->cover && Storage::disk('public')->exists($book->cover)) {
+            Storage::disk('public')->delete($book->cover);
         }
 
         $book->delete();
@@ -141,23 +156,10 @@ class BookController extends Controller
         return redirect()->route('books.manage')->with('success', 'Buku berhasil dihapus!');
     }
 
-    public function showDenda($id)
-    {
-        // 1️⃣ Ambil order berdasarkan ID dari URL
-        $order = Order::find($id);
-
-        // 2️⃣ Pastikan order ditemukan
-        if (!$order) {
-            return redirect()->back()->with('error', 'Order tidak ditemukan.');
-        }
-
-        // 3️⃣ Ambil data denda berdasarkan denda_id dari order
-        $denda = Denda::find($order->denda_id);
-
-        // 4️⃣ Kirim ke view
-        return view('books.borrow_cetak', compact('order', 'denda'));
-    }
-
+    /**
+     * Menampilkan Detail Buku & Related Books (Dari Current)
+     * Method ini PENTING dipertahankan karena Incoming tidak memilikinya.
+     */
     public function show($id)
     {
         // 1. Load buku beserta relasi kategori dan review+usernya
@@ -165,8 +167,7 @@ class BookController extends Controller
             ->where('buku_id', $id)
             ->firstOrFail();
 
-        // 2. Logic Buku Relevan (Fixed)
-        // Gunakan 'kategori_id' bukan 'kategori' object
+        // 2. Logic Buku Relevan (Related Products)
         $relatedBooks = Buku::where('kategori_id', $book->kategori_id)
             ->where('buku_id', '!=', $id) // Jangan tampilkan buku yg sedang dibuka
             ->inRandomOrder()
@@ -174,5 +175,18 @@ class BookController extends Controller
             ->get();
 
         return view('books.show', compact('book', 'relatedBooks'));
+    }
+
+    public function showDenda($id)
+    {
+        $order = Order::find($id);
+
+        if (!$order) {
+            return redirect()->back()->with('error', 'Order tidak ditemukan.');
+        }
+
+        $denda = Denda::find($order->denda_id);
+
+        return view('books.borrow_cetak', compact('order', 'denda'));
     }
 }

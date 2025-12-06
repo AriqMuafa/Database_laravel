@@ -8,10 +8,12 @@ use App\Http\Controllers\DendaController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WebhookController;
 use App\Http\Controllers\PeminjamanController;
-use App\Http\Controllers\PengembalianController;
+use App\Http\Controllers\PengembalianController; // Dari Current
 use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\BukuDigitalController;
-use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ReviewController; // Dari Current
+use App\Http\Controllers\ExpiredMemberController; // Dari Incoming
+use App\Http\Controllers\ReportController; // Dari Incoming
 
 // use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
@@ -81,6 +83,7 @@ Route::middleware(['auth', 'permission:manage_books'])->group(function () {
 Route::middleware(['auth', 'permission:view_books'])->group(function () {
     Route::get('/books', [BookController::class, 'index'])->name('books.index');
     Route::get('/book/{id}', [BookController::class, 'show'])->name('books.show');
+    // Fitur Review (Dari Current)
     Route::post('/book/{id}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
@@ -102,7 +105,7 @@ Route::middleware(['auth', 'permission:return_books'])->group(function () {
     // List Semua Peminjaman (Admin)
     Route::get('/admin/peminjaman', [PeminjamanController::class, 'adminIndex'])->name('admin.peminjaman.index');
 
-    // Proses Pengembalian
+    // Proses Pengembalian (Menggunakan PengembalianController dari Current)
     Route::put('/peminjaman/{id}/kembali', [PengembalianController::class, 'kembalikan'])->name('peminjaman.kembali');
 });
 
@@ -122,9 +125,14 @@ Route::middleware(['auth', 'permission:view_members'])->group(function () {
     Route::get('/members/{anggota}', [PeminjamanController::class, 'detailAnggota'])->name('members.detail');
 });
 
+// Menggunakan Logic INCOMING (Controller) bukan Closure lagi
+Route::middleware(['auth', 'permission:manage_expired_members'])->group(function () {
+    // Rute GET untuk menampilkan daftar anggota kadaluarsa
+    Route::get('/admin/expired-members', [ExpiredMemberController::class, 'index'])->name('admin.expired');
 
-Route::middleware(['auth', 'permission:manage_expired_members'])
-    ->get('/admin/expired-members', fn() => view('admin.expired'))->name('admin.expired');
+    // Rute DELETE untuk aksi penghapusan anggota kadaluarsa
+    Route::delete('/admin/expired-members/{anggota}', [ExpiredMemberController::class, 'destroy'])->name('admin.expired.destroy');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -230,9 +238,9 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-
+// Menggunakan Logic INCOMING (Controller)
 Route::middleware(['auth', 'permission:view_reports'])
-    ->get('/admin/reports', fn() => view('admin.reports'))->name('admin.reports');
+    ->get('/admin/reports', [ReportController::class, 'index'])->name('admin.reports');
 
 Route::middleware(['auth', 'permission:register_member'])
     ->get('/register-member', fn() => view('guest.register'))->name('register.member');
