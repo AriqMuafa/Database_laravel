@@ -15,6 +15,7 @@ class Buku extends Model
     protected $fillable = [
         'kategori_id',
         'judul',
+        'cover',
         'pengarang',
         'penerbit',
         'tahun_terbit',
@@ -39,10 +40,17 @@ class Buku extends Model
     {
         return $this->hasMany(Peminjaman::class, 'buku_id', 'buku_id');
     }
-    
+
     // Relasi: Satu Buku bisa memiliki banyak Reservasi
     public function reservasi()
     {
         return $this->hasMany(Reservasi::class, 'buku_id', 'buku_id');
+    }
+
+    public function reviews()
+    {
+        // 'buku_id' pertama = FK di tabel reviews
+        // 'buku_id' kedua = PK di tabel buku
+        return $this->hasMany(Review::class, 'buku_id', 'buku_id');
     }
 }
