@@ -20,7 +20,7 @@
                 </a>
 
                 {{-- Menambahkan 'books.*' agar menu tetap aktif saat membuka detail buku --}}
-                <a href="{{ route('menu.buku') }}"
+                <a href="{{ route('books.index') }}"
                     class="text-white hover:text-blue-200 px-3 py-2 rounded-md font-medium text-sm transition duration-150 ease-in-out {{ request()->routeIs('menu.buku', 'books.*') ? 'bg-blue-700' : '' }}">
                     Books
                 </a>

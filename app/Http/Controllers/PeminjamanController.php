@@ -140,7 +140,7 @@ class PeminjamanController extends Controller
 
     public function cetak($id)
     {
-        $peminjaman = Peminjaman::with(['anggota', 'buku'])->findOrFail($id);
+        $peminjaman = Peminjaman::with(['anggota', 'buku', 'denda'])->findOrFail($id);
         return view('peminjaman.cetak', compact('peminjaman'));
     }
 }

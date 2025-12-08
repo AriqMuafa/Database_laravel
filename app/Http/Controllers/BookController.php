@@ -163,7 +163,7 @@ class BookController extends Controller
     public function show($id)
     {
         // 1. Load buku beserta relasi kategori dan review+usernya
-        $book = Buku::with(['reviews.user', 'kategori'])
+        $book = Buku::with(['reviews.user', 'kategori', 'bukuDigital'])
             ->where('buku_id', $id)
             ->firstOrFail();
 
