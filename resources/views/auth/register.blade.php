@@ -58,7 +58,8 @@
         <div class="mt-6">
             <a href="{{ route('google.redirect') }}"
                 class="w-full justify-center inline-flex items-center px-4 py-3 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition ease-in-out duration-150 shadow-sm">
-                <svg class="w-4 h-4 me-2" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-4 h-4 me-2" viewBox="0 0 24 24" fill="currentColor"
+                    xmlns="https://www.svgrepo.com/show/475656/google-color.svg">
                     <path
                         d="M22.56 12.03c0-.76-.07-1.5-.2-2.2H12v4.18h5.71a4.9 4.9 0 01-2.13 3.3v2.7h3.48c2.04-1.88 3.23-4.66 3.23-7.98z"
                         fill="#4285F4" />
