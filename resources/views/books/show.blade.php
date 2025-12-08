@@ -1,209 +1,263 @@
 <x-app-layout>
-    {{-- Background Abu-abu Halus untuk Halaman --}}
-    <div class="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
+    {{-- Background Abu-abu Halus --}}
+    <div class="py-12 bg-slate-50 min-h-screen font-sans">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-            {{-- Tombol Kembali --}}
-            <div class="mb-6">
-                <a href="{{ route('books.index') }}"
-                    class="inline-flex items-center text-gray-600 hover:text-blue-600 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    <span class="font-medium">Kembali</span>
-                </a>
-            </div>
+            {{-- Breadcrumb / Back Button --}}
+            <nav class="flex mb-8" aria-label="Breadcrumb">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <a href="{{ route('books.index') }}"
+                            class="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z">
+                                </path>
+                            </svg>
+                            Katalog Buku
+                        </a>
+                    </li>
+                    <li>
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                    clip-rule="evenodd"></path>
+                            </svg>
+                            <span
+                                class="ml-1 text-sm font-medium text-slate-800 md:ml-2 line-clamp-1">{{ $book->judul }}</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
 
-            {{-- KARTU UTAMA (Putih) --}}
-            <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-sm overflow-hidden p-8 sm:p-10">
+            {{-- KARTU UTAMA --}}
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                <div class="p-8 sm:p-10">
+                    <div class="flex flex-col lg:flex-row gap-12">
 
-                {{-- SECTION 1: DETAIL BUKU (Atas) --}}
-                <div class="flex flex-col md:flex-row gap-10">
+                        {{-- KOLOM KIRI: Cover Buku --}}
+                        <div class="flex-shrink-0 mx-auto lg:mx-0 w-full max-w-[280px]">
+                            <div class="relative group rounded-2xl shadow-2xl overflow-hidden aspect-[2/3]">
+                                {{-- Gambar --}}
+                                <img src="{{ $book->cover ? asset('storage/covers/' . $book->cover) : 'https://via.placeholder.com/300x450' }}"
+                                    alt="{{ $book->judul }}"
+                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
 
-                    {{-- Kiri: Cover Buku (Ukuran A5: ~14.8 x 21cm) --}}
-                    {{-- Kita set width fixed agar proporsional, height auto/aspect ratio --}}
-                    <div class="flex-shrink-0 mx-auto md:mx-0">
-                        <div class="w-[260px] h-auto shadow-xl rounded-lg overflow-hidden relative group">
-                            {{-- Badge Special Offer (Opsional, sesuai gambar) --}}
-                            <div
-                                class="absolute top-4 -left-8 bg-yellow-400 text-red-600 font-bold text-xs py-1 px-10 -rotate-45 shadow-md z-10">
-                                SPECIAL OFFER
+                                {{-- Overlay Gradient --}}
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                </div>
                             </div>
 
-                            {{-- Gambar Cover --}}
-                            {{-- Ganti asset('storage/covers/'. $book->cover) sesuai path penyimpananmu --}}
-                            <img src="{{ $book->cover ? asset('storage/covers/' . $book->cover) : 'https://via.placeholder.com/150x200' }}"
-                                alt="{{ $book->judul }}" class="w-full h-auto object-cover rounded-md">
+                            {{-- Status Stok (Mobile: Hidden, Desktop: Shown below image) --}}
+                            <div class="mt-6 text-center hidden lg:block">
+                                @php
+                                    $stokTersedia =
+                                        $book->stok_buku -
+                                        ($book->peminjaman->where('status', 'dipinjam')->count() ?? 0) -
+                                        ($book->reservasi->where('status', 'menunggu')->count() ?? 0);
+                                @endphp
+                                <div
+                                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full border {{ $stokTersedia > 0 ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-700' }}">
+                                    <span class="relative flex h-2.5 w-2.5">
+                                        <span
+                                            class="animate-ping absolute inline-flex h-full w-full rounded-full {{ $stokTersedia > 0 ? 'bg-green-400' : 'bg-red-400' }} opacity-75"></span>
+                                        <span
+                                            class="relative inline-flex rounded-full h-2.5 w-2.5 {{ $stokTersedia > 0 ? 'bg-green-500' : 'bg-red-500' }}"></span>
+                                    </span>
+                                    <span class="text-sm font-semibold">
+                                        {{ $stokTersedia > 0 ? 'Stok Tersedia: ' . $stokTersedia : 'Stok Habis' }}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    {{-- Kanan: Informasi Buku --}}
-                    <div class="flex-grow">
-                        {{-- Judul --}}
-                        <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2 leading-tight">
-                            {{ $book->judul }}
-                        </h1>
+                        {{-- KOLOM KANAN: Detail & Aksi --}}
+                        <div class="flex-grow flex flex-col">
 
-                        {{-- Penulis --}}
-                        <p class="text-lg text-gray-500 dark:text-gray-400 mb-4">
-                            {{ $book->penulis }}
-                        </p>
+                            {{-- Header: Kategori & Rating --}}
+                            <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+                                <span
+                                    class="bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider border border-indigo-100">
+                                    {{ $book->kategori->nama_kategori ?? 'Umum' }}
+                                </span>
 
-                        {{-- Rating Bintang (Rata-rata Static) --}}
-                        <div class="flex items-center mb-6">
-                            @php $avgRating = $book->reviews->avg('rating') ?? 0; @endphp
-                            <div class="flex text-yellow-400">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    <svg class="w-5 h-5" fill="{{ $i <= round($avgRating) ? 'currentColor' : 'none' }}"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                {{-- Rating --}}
+                                <div
+                                    class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full border border-yellow-100">
+                                    @php $avgRating = $book->reviews->avg('rating') ?? 0; @endphp
+                                    <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                     </svg>
-                                @endfor
+                                    <span
+                                        class="text-sm font-bold text-slate-700">{{ number_format($avgRating, 1) }}</span>
+                                    <span class="text-xs text-slate-400">({{ $book->reviews->count() }} ulasan)</span>
+                                </div>
                             </div>
-                            <span class="ml-2 text-gray-400 text-sm">({{ number_format($avgRating, 1) }})</span>
-                        </div>
 
-                        {{-- Deskripsi/Sinopsis --}}
-                        <p class="text-gray-600 dark:text-gray-300 leading-relaxed mb-8 text-justify">
-                            {{ $book->deskripsi ?? '"Dasar-dasar Pemrograman Web" adalah panduan komprehensif bagi pemula yang ingin menyelami dunia pengembangan web tanpa rasa takut...' }}
-                        </p>
+                            {{-- Judul & Penulis --}}
+                            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 leading-tight mb-2">
+                                {{ $book->judul }}
+                            </h1>
+                            <p class="text-lg text-slate-500 font-medium mb-6 flex items-center gap-2">
+                                <span>Oleh:</span>
+                                <span class="text-slate-800">{{ $book->pengarang }}</span>
+                            </p>
 
-                        {{-- Metadata Tabel --}}
-                        <div class="space-y-3 text-sm text-gray-700 dark:text-gray-300 mb-8">
-                            <div class="grid grid-cols-[140px_auto]">
-                                <span class="font-bold uppercase text-gray-500">Penerbit</span>
-                                <span>: {{ $book->penerbit }}</span>
+                            {{-- Metadata Badges (Modern) --}}
+                            <div class="flex flex-wrap gap-3 mb-8">
+                                <div
+                                    class="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100 text-sm text-slate-600">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
+                                        </path>
+                                    </svg>
+                                    <span>{{ $book->penerbit }}</span>
+                                </div>
+                                <div
+                                    class="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-100 text-sm text-slate-600">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                        </path>
+                                    </svg>
+                                    <span>Tahun {{ $book->tahun_terbit }}</span>
+                                </div>
                             </div>
-                            <div class="grid grid-cols-[140px_auto]">
-                                <span class="font-bold uppercase text-gray-500">Tahun Terbit</span>
-                                <span>: {{ $book->tahun_terbit }}</span>
-                            </div>
-                            <div class="grid grid-cols-[140px_auto]">
-                                <span class="font-bold uppercase text-gray-500">Kategori</span>
-                                {{-- PERBAIKAN: Gunakan optional() atau cek null agar tidak error jika kategori dihapus --}}
-                                <span>: {{ $book->kategori ? $book->kategori->nama_kategori : 'Umum' }}</span>
-                            </div>
-                            <div class="grid grid-cols-[140px_auto]">
-                                <span class="font-bold uppercase text-gray-500">Stok</span>
-                                <span>: {{ $book->stok_buku }} Buku</span>
-                            </div>
-                        </div>
 
-                        {{-- TOMBOL AKSI (PINJAM & BACA) --}}
-                        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                            {{-- Sinopsis --}}
+                            <div class="prose prose-slate max-w-none text-slate-600 leading-relaxed mb-8">
+                                <h3 class="text-sm font-bold uppercase text-slate-400 tracking-wider mb-2">Sinopsis</h3>
+                                <p class="text-justify">
+                                    {{ $book->sinopsis ?? 'Tidak ada deskripsi untuk buku ini.' }}
+                                </p>
+                            </div>
 
-                            {{-- 1. TOMBOL PINJAM BUKU FISIK --}}
-                            @guest
-                                {{-- JIKA TAMU (BELUM LOGIN) --}}
-                                <a href="{{ route('login') }}"
-                                    onclick="return confirm('Silakan login terlebih dahulu untuk meminjam buku.')"
-                                    class="flex-1 text-center text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
-                                    style="background-color: #595959;"> {{-- Warna Abu-abu --}}
-                                    Pinjam Buku
-                                </a>
-                            @else
-                                {{-- JIKA MEMBER (SUDAH LOGIN) --}}
-                                @if ($book->stok_buku > 0)
-                                    <form action="{{ route('peminjaman.store') }}" method="POST" class="flex-1">
-                                        @csrf
-                                        <input type="hidden" name="buku_id" value="{{ $book->buku_id }}">
-                                        <input type="hidden" name="tanggal_pinjam" value="{{ date('Y-m-d') }}">
+                            <div class="mt-auto pt-6 border-t border-slate-100">
+                                {{-- TOMBOL AKSI --}}
+                                <div class="flex flex-col sm:flex-row gap-4">
 
-                                        <button type="submit"
-                                            class="w-full bg-[#7B96D4] hover:bg-[#5f7bc0] text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
-                                            onclick="return confirm('Konfirmasi peminjaman buku: {{ $book->judul }}?')">
+                                    {{-- 1. TOMBOL PINJAM --}}
+                                    @guest
+                                        <a href="{{ route('login') }}"
+                                            onclick="return confirm('Login diperlukan untuk meminjam buku.')"
+                                            class="flex-1 inline-flex justify-center items-center px-6 py-3.5 border border-transparent text-base font-bold rounded-xl text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all shadow-sm">
                                             Pinjam Buku
-                                        </button>
-                                    </form>
-                                @else
-                                    <div class="flex-1">
-                                        <button disabled
-                                            class="w-full bg-gray-300 text-gray-500 font-semibold py-3 px-8 rounded-lg cursor-not-allowed border border-gray-200">
-                                            Stok Habis
-                                        </button>
-                                    </div>
-                                @endif
-                            @endguest
+                                        </a>
+                                    @else
+                                        @if ($stokTersedia > 0)
+                                            <form action="{{ route('peminjaman.store') }}" method="POST"
+                                                class="flex-1 w-full">
+                                                @csrf
+                                                <input type="hidden" name="buku_id" value="{{ $book->buku_id }}">
+                                                <input type="hidden" name="tanggal_pinjam" value="{{ date('Y-m-d') }}">
+                                                <button type="submit" onclick="return confirm('Konfirmasi peminjaman?')"
+                                                    class="w-full inline-flex justify-center items-center px-6 py-3.5 border border-transparent text-base font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-500/30 transition-all transform hover:-translate-y-0.5">
+                                                    Pinjam Sekarang
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('reservasi.store', $book->buku_id) }}" method="POST"
+                                                class="flex-1 w-full">
+                                                @csrf
+                                                <button type="submit"
+                                                    onclick="return confirm('Stok habis. Masuk antrean reservasi?')"
+                                                    class="w-full inline-flex justify-center items-center px-6 py-3.5 border border-transparent text-base font-bold rounded-xl text-white bg-amber-500 hover:bg-amber-600 shadow-lg hover:shadow-amber-500/30 transition-all transform hover:-translate-y-0.5">
+                                                    Reservasi
+                                                </button>
+                                            </form>
+                                        @endif
+                                    @endguest
 
-
-                            {{-- 2. TOMBOL BACA BUKU DIGITAL --}}
-                            {{-- Cek apakah buku ini punya relasi ke buku_digital --}}
-                            @if ($book->bukuDigital)
-                                @guest
-                                    {{-- JIKA TAMU (BELUM LOGIN) --}}
-                                    <a href="{{ route('login') }}"
-                                        onclick="return confirm('Silakan login terlebih dahulu untuk membaca buku digital.')"
-                                        class="flex-1 text-center text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
-                                        style="background-color: #595959;"> {{-- Warna Abu-abu --}}
-                                        Baca Buku
-                                    </a>
-                                @else
-                                    {{-- JIKA MEMBER (SUDAH LOGIN) --}}
-                                    {{-- Asumsi: Route untuk baca adalah 'digital.show' --}}
-                                    <a href="{{ route('digital.show', $book->bukuDigital->buku_digital_id) }}"
-                                        target="_blank"
-                                        class="flex-1 text-center bg-[#81A2DF] hover:bg-[#5f7bc0] text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
-                                        {{-- Ikon Buku --}}
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                        </svg>
-                                        Baca Sekarang
-                                    </a>
-                                @endguest
-                            @endif
+                                    {{-- 2. TOMBOL BACA DIGITAL --}}
+                                    @if ($book->bukuDigital)
+                                        @guest
+                                            <a href="{{ route('login') }}"
+                                                onclick="return confirm('Login diperlukan untuk membaca buku.')"
+                                                class="flex-1 inline-flex justify-center items-center px-6 py-3.5 border border-transparent text-base font-bold rounded-xl text-slate-500 bg-slate-100 hover:bg-slate-200 transition-all shadow-sm">
+                                                Baca Digital
+                                            </a>
+                                        @else
+                                            <a href="{{ route('digital.show', $book->bukuDigital->buku_digital_id ?? $book->bukuDigital->id) }}"
+                                                target="_blank"
+                                                class="flex-1 inline-flex justify-center items-center gap-2 px-6 py-3.5 border border-slate-200 text-base font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-500/30 transition-all transform hover:-translate-y-0.5">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                                </svg>
+                                                Baca Digital
+                                            </a>
+                                        @endguest
+                                    @endif
+                                </div>
+                            </div>
 
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {{-- DIVIDER --}}
-                <hr class="my-12 border-gray-200 dark:border-gray-700">
+            {{-- SECTION 2: GRID BAWAH --}}
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
 
-                {{-- SECTION 2: GRID BAWAH (Komentar & Sidebar) --}}
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
-
-                    {{-- KOLOM KIRI (2/3): Area Komentar --}}
-                    <div class="lg:col-span-2">
-                        <h3 class="text-lg font-bold uppercase text-gray-500 mb-6">Tulis Komentar</h3>
+                {{-- KOLOM KIRI (2/3): Komentar --}}
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+                        <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z">
+                                </path>
+                            </svg>
+                            Ulasan & Diskusi
+                        </h3>
 
                         {{-- Form Komentar --}}
                         <div class="flex gap-4 mb-10">
-                            {{-- Avatar User Login --}}
                             <div class="flex-shrink-0">
                                 <div
-                                    class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-xl">
-                                    {{ substr(Auth::user()->name, 0, 1) }}
+                                    class="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg {{ Auth::check() ? 'bg-gradient-to-br from-indigo-500 to-purple-600' : 'bg-slate-200' }}">
+                                    @auth
+                                        {{ substr(Auth::user()->name, 0, 1) }}
+                                    @else
+                                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                            </path>
+                                        </svg>
+                                    @endauth
                                 </div>
                             </div>
 
                             <div class="flex-grow">
                                 <form action="{{ route('reviews.store', $book->buku_id) }}" method="POST">
                                     @csrf
-                                    {{-- Textarea --}}
                                     <textarea name="comment" rows="2"
-                                        class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-400 focus:border-transparent resize-none dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                                        placeholder="Ketik disini..."></textarea>
+                                        class="w-full border border-slate-200 rounded-xl p-4 focus:ring-2 focus:ring-indigo-100 focus:border-indigo-400 resize-none transition-all placeholder-slate-400 text-slate-700 bg-slate-50 focus:bg-white"
+                                        placeholder="Bagikan pendapat Anda tentang buku ini..."></textarea>
 
-                                    {{-- Baris Bawah Input: Bintang & Tombol --}}
                                     <div class="flex justify-between items-center mt-3">
-                                        {{-- Alpine JS Stars --}}
+                                        {{-- Rating Stars --}}
                                         <div x-data="{ rating: 0, hoverRating: 0 }" class="flex space-x-1">
                                             <input type="hidden" name="rating" :value="rating">
                                             <template x-for="star in 5">
                                                 <button type="button" @click="rating = star"
                                                     @mouseover="hoverRating = star" @mouseleave="hoverRating = 0"
-                                                    class="focus:outline-none">
+                                                    class="focus:outline-none transition-transform hover:scale-110">
                                                     <svg class="w-6 h-6 transition-colors duration-150"
                                                         :class="{
-                                                            'text-gray-400': !(hoverRating >= star || (!hoverRating &&
+                                                            'text-slate-200': !(hoverRating >= star || (!hoverRating &&
                                                                 rating >= star)),
-                                                            'text-yellow-400': hoverRating >= star || (!hoverRating &&
-                                                                rating >= star)
+                                                            'text-yellow-400': hoverRating >=
+                                                                star || (!hoverRating && rating >= star)
                                                         }"
                                                         fill="currentColor" viewBox="0 0 20 20">
                                                         <path
@@ -213,94 +267,109 @@
                                             </template>
                                         </div>
 
-                                        <button type="submit"
-                                            class="bg-[#7B96D4] hover:bg-[#5f7bc0] text-white px-6 py-2 rounded-lg font-medium shadow-sm transition">
-                                            Posting
-                                        </button>
+                                        @auth
+                                            <button type="submit"
+                                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold shadow-sm transition text-sm">
+                                                Kirim Ulasan
+                                            </button>
+                                        @else
+                                            <a href="{{ route('login') }}" onclick="alert('Login diperlukan.')"
+                                                class="bg-slate-200 hover:bg-slate-300 text-slate-600 px-6 py-2 rounded-lg font-semibold transition text-sm">
+                                                Kirim Ulasan
+                                            </a>
+                                        @endauth
                                     </div>
                                 </form>
                             </div>
                         </div>
 
-                        {{-- List Komentar --}}
-                        <h3 class="text-lg font-bold uppercase text-gray-500 mb-6">Komentar</h3>
-
+                        {{-- Review List --}}
                         <div class="space-y-8">
                             @forelse($book->reviews as $review)
-                                <div class="flex gap-4">
-                                    {{-- Avatar Komentar --}}
+                                <div class="flex gap-4 pb-6 border-b border-slate-50 last:border-0 last:pb-0">
                                     <div class="flex-shrink-0">
                                         <div
-                                            class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-xl">
+                                            class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-sm">
                                             {{ substr($review->user->name, 0, 1) }}
                                         </div>
                                     </div>
-                                    {{-- Isi Komentar --}}
-                                    <div>
-                                        <div class="flex items-baseline gap-2 mb-1">
+                                    <div class="flex-grow">
+                                        <div class="flex items-center justify-between mb-1">
+                                            <h4 class="font-bold text-slate-800 text-sm">{{ $review->user->name }}
+                                            </h4>
                                             <span
-                                                class="font-bold text-gray-900 dark:text-white">{{ $review->user->name }}</span>
-
-                                            {{-- Bintang User --}}
-                                            <div class="flex text-yellow-400 text-sm">
-                                                @for ($i = 1; $i <= 5; $i++)
-                                                    @if ($i <= $review->rating)
-                                                        ★
-                                                    @endif
-                                                @endfor
-                                            </div>
-
-                                            <span class="text-gray-400 text-xs ml-auto sm:ml-2">•
-                                                {{ $review->created_at->format('F d, Y') }}</span>
+                                                class="text-xs text-slate-400">{{ $review->created_at->diffForHumans() }}</span>
                                         </div>
-                                        <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                                            {{ $review->comment }}
-                                        </p>
+                                        <div class="flex text-yellow-400 text-xs mb-2">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                @if ($i <= $review->rating)
+                                                    ★
+                                                @else
+                                                    <span class="text-slate-200">★</span>
+                                                @endif
+                                            @endfor
+                                        </div>
+                                        <p class="text-slate-600 text-sm leading-relaxed">{{ $review->comment }}</p>
                                     </div>
                                 </div>
                             @empty
-                                <p class="text-gray-500 italic">Belum ada komentar. Jadilah yang pertama!</p>
+                                <div class="text-center py-8 text-slate-400">
+                                    <p>Belum ada ulasan. Jadilah yang pertama mereview!</p>
+                                </div>
                             @endforelse
                         </div>
                     </div>
+                </div>
 
-                    {{-- KOLOM KANAN (1/3): Buku Relevan --}}
-                    <div>
-                        <h3 class="text-lg font-bold uppercase text-gray-500 mb-6 text-center lg:text-left">Buku Yang
-                            Relevan</h3>
+                {{-- KOLOM KANAN (1/3): Buku Relevan --}}
+                <div>
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 sticky top-24">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="h-6 w-1 bg-indigo-500 rounded-full"></div>
+                            <h3 class="text-lg font-bold text-slate-800 uppercase tracking-wide">Buku Terkait</h3>
+                        </div>
 
-                        <div class="flex flex-col gap-6">
+                        <div class="flex flex-col gap-4">
                             @foreach ($relatedBooks as $related)
-                                <div class="group">
-                                    {{-- Card Buku Kecil --}}
-                                    <div
-                                        class="relative bg-gray-800 rounded-lg overflow-hidden shadow-lg aspect-[2/3] w-[180px] mx-auto lg:mx-0">
+                                <a href="{{ route('books.show', $related->buku_id) }}"
+                                    class="group flex items-start gap-4 p-3 rounded-xl hover:bg-slate-50 transition-all duration-300">
+
+                                    {{-- Thumbnail --}}
+                                    <div class="flex-shrink-0 w-16 h-24 rounded-lg overflow-hidden shadow-sm relative">
                                         <img src="{{ $related->cover ? asset('storage/' . $related->cover) : 'https://via.placeholder.com/150x225' }}"
                                             alt="{{ $related->judul }}"
-                                            class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition duration-300">
+                                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                    </div>
 
-                                        {{-- Text Overlay --}}
-                                        <div
-                                            class="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent flex flex-col justify-end p-4">
-                                            <h4 class="text-white font-bold leading-tight mb-1">{{ $related->judul }}
+                                    {{-- Detail --}}
+                                    <div class="flex-grow flex flex-col justify-between h-24 py-0.5">
+                                        <div>
+                                            <span
+                                                class="text-[10px] font-bold text-indigo-500 uppercase tracking-wider mb-1 block">
+                                                {{ $related->kategori->nama_kategori ?? 'Umum' }}
+                                            </span>
+                                            <h4 class="font-bold text-slate-800 text-sm leading-snug line-clamp-2 group-hover:text-indigo-600 transition-colors"
+                                                title="{{ $related->judul }}">
+                                                {{ $related->judul }}
                                             </h4>
                                         </div>
+                                        <div
+                                            class="flex items-center text-xs font-medium text-slate-400 group-hover:text-indigo-500 transition-colors">
+                                            <span>Lihat Detail</span>
+                                            <svg class="w-3 h-3 ml-1 transform group-hover:translate-x-1 transition-transform"
+                                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </div>
                                     </div>
-                                    {{-- Tombol Periksa --}}
-                                    <div class="mt-3 w-[180px] mx-auto lg:mx-0">
-                                        <a href="{{ route('books.show', $related->buku_id) }}"
-                                            class="block w-full bg-[#7B96D4] hover:bg-[#5f7bc0] text-white text-center py-2 rounded-md font-medium text-sm transition shadow-sm">
-                                            Periksa
-                                        </a>
-                                    </div>
-                                </div>
+                                </a>
                             @endforeach
                         </div>
                     </div>
+                </div>
 
-                </div> {{-- End Grid Bawah --}}
-
-            </div> {{-- End Kartu Utama --}}
+            </div>
         </div>
     </div>
 </x-app-layout>
