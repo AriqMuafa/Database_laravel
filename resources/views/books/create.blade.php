@@ -52,8 +52,7 @@
                                 <label for="cover"
                                     class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2">Cover Buku
                                     (Opsional):</label>
-                                <input type="file" name="cover" id="cover"
-                                    accept="image/png, image/jpeg, image/jpg"
+                                <input type="file" name="cover" id="cover" accept="image/png, image/jpeg, image/jpg"
                                     class="block w-full text-sm text-gray-500 dark:text-gray-300
                                 file:mr-4 file:py-2 file:px-4
                                 file:rounded-md file:border-0
@@ -95,11 +94,13 @@
                                     <option value="">-- Pilih Kategori --</option>
                                     {{-- Variabel $kategori dikirim dari controller --}}
                                     @foreach ($kategori ?? [] as $item)
-                                        <option value="{{ $item->kategori_id }}"
-                                            {{ old('kategori_id') == $item->kategori_id ? 'selected' : '' }}>
-                                            {{ $item->nama_kategori }}
-                                        </option>
+                                        @if(is_object($item))
+                                            <option value="{{ $item->kategori_id }}" {{ old('kategori_id') == $item->kategori_id ? 'selected' : '' }}>
+                                                {{ $item->nama_kategori }}
+                                            </option>
+                                        @endif
                                     @endforeach
+
                                 </select>
                             </div>
 
