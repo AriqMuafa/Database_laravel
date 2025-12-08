@@ -141,6 +141,10 @@
                         {{ __('Peminjaman Saya') }}
                     </x-responsive-nav-link>
 
+                    <!-- <x-responsive-nav-link :href="route('reservations.index')" class="text-blue-100 hover:text-white">
+                        {{ __('Reservasi Saya') }}
+                    </x-responsive-nav-link> -->
+
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <x-responsive-nav-link :href="route('logout')"

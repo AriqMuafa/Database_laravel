@@ -40,7 +40,7 @@
                                         <td class="py-4 px-6">{{ $res->tanggal_reservasi }}</td>
                                         <td class="py-4 px-6">
                                             {{-- Logika Status dan Badge (hanya menghapus kelas 'dark:') --}}
-                                            @if ($res->status == 'Menunggu')
+                                            @if ($res->status == 'Pending')
                                                 <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2.5 py-0.5 rounded">
                                                     {{ $res->status }}
                                                 </span>
