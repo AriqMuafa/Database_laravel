@@ -33,8 +33,8 @@
                             </div>
 
                             {{-- Gambar Cover --}}
-                            {{-- Ganti asset('storage/'. $book->cover) sesuai path penyimpananmu --}}
-                            <img src="{{ $book->cover ? asset('storage/' . $book->cover) : 'https://via.placeholder.com/150x200' }}"
+                            {{-- Ganti asset('storage/covers/'. $book->cover) sesuai path penyimpananmu --}}
+                            <img src="{{ $book->cover ? asset('storage/covers/' . $book->cover) : 'https://via.placeholder.com/150x200' }}"
                                 alt="{{ $book->judul }}" class="w-full h-auto object-cover rounded-md">
                         </div>
                     </div>

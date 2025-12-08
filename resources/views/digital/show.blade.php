@@ -11,7 +11,7 @@
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 flex flex-col md:flex-row gap-6">
 
                 {{-- Cover --}}
-                <img src="{{ $book->cover ? asset('storage/' . $book->cover) : 'https://via.placeholder.com/300x400' }}"
+                <img src="{{ $book->cover ? asset('storage/covers/' . $book->cover) : 'https://via.placeholder.com/300x400' }}"
                      class="w-48 h-64 object-cover rounded-lg shadow"
                      alt="Cover Buku">
 

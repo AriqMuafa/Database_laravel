@@ -103,7 +103,7 @@
                                     @endif
 
                                     {{-- Gambar --}}
-                                    <img src="{{ $book->cover ? asset('storage/' . $book->cover) : 'https://via.placeholder.com/150x200' }}"
+                                    <img src="{{ $book->cover ? asset('storage/covers/' . $book->cover) : 'https://via.placeholder.com/150x200' }}"
                                         alt="{{ $book->judul }}"
                                         class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
                                 </div>
