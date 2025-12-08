@@ -13,10 +13,15 @@ use App\Http\Controllers\ReservasiController;
 use App\Http\Controllers\BukuDigitalController;
 use App\Http\Controllers\ReviewController; // Dari Current
 use App\Http\Controllers\ExpiredMemberController; // Dari Incoming
-use App\Http\Controllers\ReportController; // Dari Incoming
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\GoogleController;
+ // Dari Incoming
 
 // use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');
+Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 
 /*
 |--------------------------------------------------------------------------

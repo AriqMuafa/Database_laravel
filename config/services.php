@@ -35,11 +35,17 @@ return [
         ],
     ],
 
-     'payment' => [
+    'payment' => [
         'api_key' => env('PAYMENT_API_KEY'),
         'base_url' => env('PAYMENT_BASE_URL'),
         'webhook_secret' => env('PAYMENT_WEBHOOK_SECRET'),
         'expired_hours' => env('PAYMENT_EXPIRED_HOURS', 24),
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
 ];
