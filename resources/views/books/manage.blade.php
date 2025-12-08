@@ -77,7 +77,7 @@
                                         {{-- Cover --}}
                                         <td class="px-4 py-4 whitespace-nowrap">
                                             @if ($book->cover)
-                                                <img src="{{ asset('storage/' . $book->cover) }}" alt="Cover"
+                                                <img src="{{ asset('storage/covers/' . $book->cover) }}" alt="Cover"
                                                     class="h-16 w-12 object-cover rounded shadow border border-gray-200 dark:border-gray-600">
                                             @else
                                                 <div

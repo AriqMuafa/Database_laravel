@@ -57,13 +57,13 @@
                             </button>
                         @endif
 
-                        {{-- Download --}}
+                        <!-- {{-- Download --}}
                         @if ($book->is_downloadable && $book->hak_akses === 'open access')
                             <a href="{{ route('digital.download', $book->buku_digital_id) }}"
                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
                                 Download
                             </a>
-                        @endif
+                        @endif -->
                     </div>
 
                 </div>

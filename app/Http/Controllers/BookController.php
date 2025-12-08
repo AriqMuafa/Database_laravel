@@ -74,7 +74,7 @@ class BookController extends Controller
             'judul'         => 'required|string|max:255',
             'cover'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Fitur Current
             'pengarang'     => 'required|string|max:255',
-            'penerbit'      => 'required|string|max:255', // Fitur Current
+            //'penerbit'      => 'required|string|max:255', // Fitur Current
             'tahun_terbit'  => 'required|integer|digits:4|min:1000|max:' . date('Y'),
             'sinopsis'      => 'nullable|string',
             'stok_buku'     => 'required|integer|min:0',

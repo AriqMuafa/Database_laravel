@@ -25,7 +25,7 @@
                     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
 
                         {{-- Cover --}}
-                        <img src="{{ $digital->cover ? asset('storage/' . $digital->cover) : 'https://via.placeholder.com/300x400' }}"
+                        <img src="{{ $digital->cover ? asset('storage/covers/' . $digital->cover) : 'https://via.placeholder.com/300x400' }}"
                             class="w-full h-56 object-cover" alt="Cover Buku">
 
                         <div class="p-6">
