@@ -2,33 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-/**
- * @property int $id
- * @property int $user_id
- * @property int $denda_id
- * @property string $order_number
- * @property float $amount
- * @property string $payment_status
- * @property string|null $checkout_link
- * @property \Illuminate\Support\Carbon|null $paid_at
- * @property \Illuminate\Support\Carbon|null $expired_at
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- */
 
 class Order extends Model
 {
-    use HasFactory;
-    protected $guarded = ['id'];
-
     protected $fillable = [
         'user_id',
-        'denda_id',
+        'denda_id',         
         'order_number',
-        'amount',
+        'amount',           
         'payment_status',
         'va_number',
         'payment_url',
@@ -37,7 +19,7 @@ class Order extends Model
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
+        'amount' => 'decimal:2',   
         'paid_at' => 'datetime',
         'expired_at' => 'datetime',
     ];
@@ -65,6 +47,6 @@ class Order extends Model
     public function isExpired()
     {
         return $this->payment_status === 'expired' ||
-            ($this->expired_at && now()->isAfter($this->expired_at));
+               ($this->expired_at && now()->isAfter($this->expired_at));
     }
 }
