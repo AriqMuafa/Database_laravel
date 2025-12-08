@@ -24,16 +24,19 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', fn() => view('welcome'))->name('guest.home');
+// Ubah: dari view('welcome') ke redirect dashboard
+Route::get('/', fn() => redirect('/dashboard'))->name('guest.home');
+
+// Halaman informasi guest tetap
 Route::get('/about-us', fn() => view('about'))->name('about');
 Route::get('/contact', fn() => view('contact'))->name('contact');
 
+// Dashboard bisa diakses guest maupun user
 Route::get('/dashboard', fn() => view('dashboard'))
-    ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+// Profil tetap harus login
 Route::middleware('auth')->group(function () {
-    // Profil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -80,10 +83,12 @@ Route::middleware(['auth', 'permission:manage_books'])->group(function () {
 });
 
 // 2. KATALOG BUKU (User & Admin)
-Route::middleware(['auth', 'permission:view_books'])->group(function () {
-    Route::get('/books', [BookController::class, 'index'])->name('books.index');
-    Route::get('/book/{id}', [BookController::class, 'show'])->name('books.show');
-    // Fitur Review (Dari Current)
+// Katalog bisa dilihat publik (guest)
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
+Route::get('/book/{id}', [BookController::class, 'show'])->name('books.show');
+
+// Yang butuh login & permission
+Route::middleware(['auth', 'permission:borrow_books'])->group(function () {
     Route::post('/book/{id}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 });
 
