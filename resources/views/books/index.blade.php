@@ -1,244 +1,204 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Daftar Buku') }}
+        <h2
+            class="font-bold text-2xl leading-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-blue-800 drop-shadow-md text-center">
+            {{ __('Katalog Buku') }}
         </h2>
     </x-slot>
 
-    <div class="py-12 bg-gray-100 min-h-screen">
+    <div class="pb-12 bg-gray-50 min-h-screen font-sans">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-            {{-- Pesan Sukses --}}
+            {{-- Pesan Sukses (Toast Style) --}}
             @if (session('success'))
-                <div class="mb-6 p-4 text-green-700 bg-green-100 border border-green-200 rounded-lg shadow-sm">
-                    <div class="flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        {{ session('success') }}
-                    </div>
+                <div x-data="{ show: true }" x-show="show" x-transition
+                    class="fixed bottom-5 right-5 z-50 bg-green-600 text-white px-6 py-3 rounded-lg shadow-xl flex items-center gap-3">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="font-medium">{{ session('success') }}</span>
+                    <button @click="show = false" class="ml-4 hover:text-green-200"><svg class="w-4 h-4" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg></button>
                 </div>
             @endif
 
-            {{-- Kontainer Putih Utama --}}
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            {{-- HEADER SECTION: Filter & Search --}}
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-8">
+                <form action="{{ route('books.index') }}" method="GET"
+                    class="flex flex-col md:flex-row gap-4 justify-between items-center">
 
-                {{-- Header: Filter Kategori & Pencarian (Dari Incoming - Lebih Lengkap) --}}
-                <div class="p-6 border-b border-gray-200">
-                    <form action="{{ route('books.index') }}" method="GET"
-                        class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                    {{-- Dropdown Kategori (Modern Style) --}}
+                    <div class="w-full md:w-1/3 relative">
+                        <select name="category" onchange="this.form.submit()"
+                            class="w-full appearance-none bg-gray-50 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded-xl focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all cursor-pointer">
+                            <option value="">Semua Kategori</option>
+                            @foreach ($kategori as $cat)
+                                <option value="{{ $cat->kategori_id }}"
+                                    {{ request('category') == $cat->kategori_id ? 'selected' : '' }}>
+                                    {{ $cat->nama_kategori }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                        {{-- Group Filter & Search --}}
-                        <div class="flex flex-col sm:flex-row gap-4 w-full">
-
-                            {{-- Dropdown Filter Kategori --}}
-                            <div class="w-full sm:w-1/3">
-                                <select name="category" id="category"
-                                    class="w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                                    onchange="this.form.submit()">
-                                    <option value="" @if (!request('category')) selected @endif>Semua
-                                        Kategori</option>
-                                    @foreach ($kategori as $cat)
-                                        <option value="{{ $cat->kategori_id }}"
-                                            @if (request('category') == $cat->kategori_id) selected @endif>
-                                            {{ $cat->nama_kategori }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            {{-- Input Pencarian --}}
-                            <div class="relative w-full sm:w-2/3">
-                                <input type="text" name="search"
-                                    class="w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md pl-4 pr-10 shadow-sm"
-                                    placeholder="Cari judul, pengarang, sinopsis..." value="{{ request('search') }}">
-
-                                <button type="submit"
-                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-indigo-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                </button>
-                            </div>
+                    {{-- Search Bar (Expanded) --}}
+                    <div class="w-full md:w-2/3 relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
                         </div>
+                        <input type="text" name="search" value="{{ request('search') }}"
+                            class="block w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all"
+                            placeholder="Cari judul buku, penulis, atau topik...">
 
-                        {{-- Tombol Reset (Jika sedang filter/search) --}}
                         @if (request('search') || request('category'))
                             <a href="{{ route('books.index') }}"
-                                class="whitespace-nowrap px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 flex items-center shadow-sm transition">
-                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                                Reset Filter
+                                class="absolute inset-y-2 right-2 px-4 flex items-center text-sm font-medium text-red-500 bg-red-50 hover:bg-red-100 rounded-lg transition-colors">
+                                Reset
                             </a>
                         @endif
-                    </form>
-                </div>
+                    </div>
+                </form>
+            </div>
 
-                {{-- Grid Buku (Dari Current - Layout Kartu Lengkap) --}}
-                <div class="p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 sm:gap-8">
-                    @forelse ($books as $book)
-                        {{-- Card Item --}}
-                        <div
-                            class="group flex flex-col bg-white rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100 h-full relative">
+            {{-- GRID BUKU --}}
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 mb-12">
+                @forelse ($books as $book)
+                    <div
+                        class="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col overflow-hidden h-full">
 
-                            {{-- 1. GAMBAR BUKU (Clickable ke Detail) --}}
-                            <a href="{{ route('books.show', $book->buku_id) }}" class="block relative w-full">
-                                {{-- Rasio A5 (13.5 : 20) = aspect-[135/200] --}}
-                                <div class="aspect-[135/200] bg-gray-200 overflow-hidden relative">
-                                    @if ($book->stok_buku <= 0)
-                                        {{-- Overlay Stok Habis --}}
-                                        <div
-                                            class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
-                                            <span
-                                                class="text-white font-bold text-sm px-3 py-1 bg-red-600 rounded-full shadow-lg transform -rotate-12">
-                                                Stok Habis
-                                            </span>
-                                        </div>
-                                    @endif
+                        {{-- Cover Image --}}
+                        <div class="relative aspect-[2/3] overflow-hidden bg-gray-100">
+                            <a href="{{ route('books.show', $book->buku_id) }}" class="block w-full h-full">
+                                <img src="{{ $book->cover ? asset('storage/covers/' . $book->cover) : 'https://via.placeholder.com/300x450?text=No+Cover' }}"
+                                    alt="{{ $book->judul }}"
+                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
 
-                                    {{-- Gambar --}}
-                                    <img src="{{ $book->cover ? asset('storage/covers/' . $book->cover) : 'https://via.placeholder.com/150x200' }}"
-                                        alt="{{ $book->judul }}"
-                                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
-                                </div>
-                            </a>
-
-                            {{-- 2. INFORMASI BUKU --}}
-                            <div class="p-3 flex flex-col flex-grow">
-                                {{-- Kategori --}}
-                                <div class="text-xs text-blue-500 font-semibold uppercase tracking-wider mb-1 truncate">
-                                    {{ $book->kategori->nama_kategori ?? 'Umum' }}
-                                </div>
-
-                                {{-- Judul (Clickable ke Detail) --}}
-                                <a href="{{ route('books.show', $book->buku_id) }}" class="block mb-1">
-                                    <h3 class="text-sm font-bold text-gray-900 leading-tight line-clamp-2 hover:text-blue-600 transition-colors"
-                                        title="{{ $book->judul }}">
-                                        {{ $book->judul }}
-                                    </h3>
-                                </a>
-
-                                {{-- Pengarang --}}
-                                <p class="text-xs text-gray-500 mb-3 truncate">
-                                    {{ $book->pengarang }} ({{ $book->tahun_terbit }})
-                                </p>
-
-                                {{-- Spacer agar tombol selalu di bawah --}}
-                                <div class="mt-auto">
-
-                                    {{-- Info Stok --}}
+                                {{-- Overlay Stok Habis --}}
+                                @if ($book->stok_buku <= 0)
                                     <div
-                                        class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 mb-2">
-                                        @php
-                                            // Hitung stok tersedia (total stok dikurangi buku yang sedang dipinjam/di reservasi)
-                                            // Asumsi $book->peminjaman dan $book->reservasi adalah relasi yang ada di model Buku
-                                            $stokTersedia =
-                                                $book->stok_buku -
-                                                ($book->peminjaman->where('status', 'dipinjam')->count() ?? 0) -
-                                                ($book->reservasi->where('status', 'menunggu')->count() ?? 0);
-                                        @endphp
+                                        class="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center">
                                         <span
-                                            class="text-xs font-medium {{ $stokTersedia > 0 ? 'text-green-600' : 'text-red-500' }}">
-                                            Stok: {{ $stokTersedia }} / {{ $book->stok_buku }}
+                                            class="bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg transform -rotate-6 border-2 border-white">
+                                            STOK HABIS
                                         </span>
                                     </div>
+                                @endif
 
-                                    {{-- 3. TOMBOL AKSI --}}
-                                    @if (Auth::check())
-                                        @if (Auth::user()->anggota)
-                                            {{-- Stok ADA --}}
-                                            @if ($stokTersedia > 0)
-                                                <form action="{{ route('peminjaman.store') }}" method="POST"
-                                                    class="w-full">
-                                                    @csrf
-                                                    <input type="hidden" name="buku_id" value="{{ $book->buku_id }}">
-                                                    <input type="hidden" name="tanggal_pinjam"
-                                                        value="{{ date('Y-m-d') }}">
-                                                    <button type="submit"
-                                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold py-2 px-3 rounded-md transition duration-150 shadow-sm flex items-center justify-center"
-                                                        onclick="return confirm('Apakah Anda yakin ingin meminjam buku ini?')">
-                                                        Pinjam Sekarang
-                                                    </button>
-                                                </form>
+                                {{-- Kategori Badge (Top Left) --}}
+                                <div class="absolute top-3 left-3">
+                                    <span
+                                        class="bg-white/90 backdrop-blur-md text-indigo-600 text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm uppercase tracking-wide border border-white/50">
+                                        {{ $book->kategori->nama_kategori ?? 'Umum' }}
+                                    </span>
+                                </div>
+                            </a>
+                        </div>
 
-                                                {{-- Stok HABIS -> Reservasi --}}
-                                            @else
-                                                <form action="{{ route('reservasi.store', $book->buku_id) }}"
-                                                    method="POST" class="w-full"
-                                                    onsubmit="return confirm('Anda akan masuk antrean untuk buku ini. Lanjutkan?');">
-                                                    @csrf
-                                                    <button type="submit"
-                                                        class="w-full bg-yellow-500 hover:bg-yellow-600 text-white text-xs font-semibold py-2 px-3 rounded-md transition duration-150 shadow-sm flex items-center justify-center">
-                                                        Reservasi
-                                                    </button>
-                                                </form>
-                                            @endif
+                        {{-- Info Content --}}
+                        <div class="p-4 flex flex-col flex-grow">
+                            {{-- Judul --}}
+                            <a href="{{ route('books.show', $book->buku_id) }}" class="block mb-1">
+                                <h3 class="font-bold text-gray-800 text-sm leading-snug line-clamp-2 group-hover:text-indigo-600 transition-colors"
+                                    title="{{ $book->judul }}">
+                                    {{ $book->judul }}
+                                </h3>
+                            </a>
+
+                            {{-- Penulis --}}
+                            <p class="text-xs text-gray-500 mb-3">{{ $book->pengarang }}</p>
+
+                            {{-- Divider Spacer --}}
+                            <div class="mt-auto pt-3 border-t border-gray-50 flex flex-col gap-2">
+
+                                {{-- Stok Info --}}
+                                @php
+                                    $stokTersedia =
+                                        $book->stok_buku -
+                                        ($book->peminjaman->where('status', 'dipinjam')->count() ?? 0) -
+                                        ($book->reservasi->where('status', 'menunggu')->count() ?? 0);
+                                @endphp
+                                <div class="flex justify-between items-center text-xs font-medium text-gray-400">
+                                    <span>Tersedia:</span>
+                                    <span
+                                        class="{{ $stokTersedia > 0 ? 'text-green-600 bg-green-50 px-2 py-0.5 rounded' : 'text-red-500 bg-red-50 px-2 py-0.5 rounded' }}">
+                                        {{ $stokTersedia }} / {{ $book->stok_buku }}
+                                    </span>
+                                </div>
+
+                                {{-- Action Buttons --}}
+                                @auth
+                                    @if (Auth::user()->anggota)
+                                        @if ($stokTersedia > 0)
+                                            <form action="{{ route('peminjaman.store') }}" method="POST" class="w-full">
+                                                @csrf
+                                                <input type="hidden" name="buku_id" value="{{ $book->buku_id }}">
+                                                <input type="hidden" name="tanggal_pinjam" value="{{ date('Y-m-d') }}">
+                                                <button type="submit" onclick="return confirm('Pinjam buku ini?')"
+                                                    class="w-full py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-sm hover:shadow-md transition-all active:scale-95">
+                                                    Pinjam
+                                                </button>
+                                            </form>
                                         @else
-                                            {{-- User Login tapi bukan Anggota --}}
-                                            <a href="{{ route('profile.edit') }}"
-                                                class="block w-full text-center bg-gray-100 hover:bg-gray-200 text-indigo-600 text-xs font-semibold py-2 rounded-md transition border border-gray-200">
-                                                Lengkapi Profil
-                                            </a>
+                                            <form action="{{ route('reservasi.store', $book->buku_id) }}" method="POST"
+                                                class="w-full">
+                                                @csrf
+                                                <button type="submit" onclick="return confirm('Masuk antrean reservasi?')"
+                                                    class="w-full py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white text-xs font-semibold shadow-sm hover:shadow-md transition-all active:scale-95">
+                                                    Reservasi
+                                                </button>
+                                            </form>
                                         @endif
                                     @else
-                                        {{-- Belum Login --}}
-                                        <a href="{{ route('login') }}"
-                                            class="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-semibold py-2 rounded-md transition border border-gray-200">
-                                            Login untuk Pinjam
+                                        <a href="{{ route('profile.edit') }}"
+                                            class="block w-full py-2 text-center rounded-lg border border-indigo-200 text-indigo-600 text-xs font-semibold hover:bg-indigo-50 transition-colors">
+                                            Lengkapi Profil
                                         </a>
                                     @endif
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        {{-- Tampilan Kosong (Dari Incoming - Lebih Informatif) --}}
-                        <div class="col-span-full py-16 text-center">
-                            <div class="inline-block p-4 rounded-full bg-gray-50 mb-4">
-                                <svg class="w-12 h-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-medium text-gray-900">Tidak ada buku ditemukan</h3>
-                            <p class="mt-1 text-gray-500 max-w-md mx-auto">
-                                @if (request('search') && request('category'))
-                                    Kami tidak dapat menemukan buku dengan kata kunci
-                                    <strong>"{{ request('search') }}"</strong> di kategori yang dipilih.
-                                @elseif(request('search'))
-                                    Coba gunakan kata kunci lain atau periksa ejaan Anda.
-                                @elseif(request('category'))
-                                    Belum ada buku dalam kategori ini.
                                 @else
-                                    Koleksi pustaka saat ini masih kosong.
-                                @endif
-                            </p>
-                            @if (request('search') || request('category'))
-                                <div class="mt-6">
-                                    <a href="{{ route('books.index') }}"
-                                        class="text-indigo-600 hover:text-indigo-500 font-medium">
-                                        Hapus semua filter &rarr;
+                                    <a href="{{ route('login') }}"
+                                        class="block w-full py-2 text-center rounded-lg bg-gray-100 text-gray-500 text-xs font-semibold hover:bg-gray-200 transition-colors">
+                                        Login
                                     </a>
-                                </div>
-                            @endif
+                                @endauth
+                            </div>
                         </div>
-                    @endforelse
-                </div>
-
-                {{-- Pagination Links (Dari Incoming - Syntax Modern) --}}
-                @if ($books->hasPages())
-                    <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
-                        {{ $books->links() }}
                     </div>
-                @endif
+                @empty
+                    {{-- Empty State --}}
+                    <div
+                        class="col-span-full py-16 text-center bg-white rounded-2xl border border-dashed border-gray-300">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 mb-4">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                </path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">Tidak ada buku ditemukan</h3>
+                        <p class="text-gray-500 text-sm mb-6">Coba ubah kata kunci pencarian atau filter kategori Anda.
+                        </p>
+                        <a href="{{ route('books.index') }}"
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
+                            Reset Semua Filter
+                        </a>
+                    </div>
+                @endforelse
+            </div>
 
-            </div> {{-- End Kontainer Putih --}}
+            {{-- Pagination --}}
+            @if ($books->hasPages())
+                <div class="mt-8">
+                    {{ $books->links() }}
+                </div>
+            @endif
+
         </div>
     </div>
 </x-app-layout>
