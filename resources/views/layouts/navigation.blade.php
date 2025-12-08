@@ -17,7 +17,8 @@
                     Home
                 </a>
 
-                <a href="{{ route('menu.buku') }}"
+                {{-- Menambahkan 'books.*' agar menu tetap aktif saat membuka detail buku --}}
+                <a href="{{ route('books.index') }}"
                     class="text-white hover:text-blue-200 px-3 py-2 rounded-md font-medium text-sm transition duration-150 ease-in-out {{ request()->routeIs('menu.buku', 'books.*') ? 'bg-blue-700' : '' }}">
                     Books
                 </a>
@@ -95,9 +96,8 @@
                         <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex"
                             stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{ 'hidden': !open, 'inline-flex': open }" class="hidden"
-                            stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
+                        <path :class="{ 'hidden': !open, 'inline-flex': open }" class="hidden" stroke-linecap="round"
+                            stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>

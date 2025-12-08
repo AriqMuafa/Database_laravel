@@ -88,31 +88,76 @@
                             </div>
                             <div class="grid grid-cols-[140px_auto]">
                                 <span class="font-bold uppercase text-gray-500">Stok</span>
-                                <span>: {{ $book->stok }} Buku</span>
+                                <span>: {{ $book->stok_buku }} Buku</span>
                             </div>
                         </div>
 
-                        {{-- Tombol Pinjam --}}
-                        @if ($book->stok_buku > 0)
-                            <form action="{{ route('peminjaman.store') }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="buku_id" value="{{ $book->buku_id }}">
+                        {{-- TOMBOL AKSI (PINJAM & BACA) --}}
+                        <div class="mt-8 flex flex-col sm:flex-row gap-4">
 
-                                {{-- Input Hidden: Tanggal Pinjam (Otomatis Hari Ini) --}}
-                                <input type="hidden" name="tanggal_pinjam" value="{{ date('Y-m-d') }}">
+                            {{-- 1. TOMBOL PINJAM BUKU FISIK --}}
+                            @guest
+                                {{-- JIKA TAMU (BELUM LOGIN) --}}
+                                <a href="{{ route('login') }}"
+                                    onclick="return confirm('Silakan login terlebih dahulu untuk meminjam buku.')"
+                                    class="flex-1 text-center text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
+                                    style="background-color: #595959;"> {{-- Warna Abu-abu --}}
+                                    Pinjam Buku
+                                </a>
+                            @else
+                                {{-- JIKA MEMBER (SUDAH LOGIN) --}}
+                                @if ($book->stok_buku > 0)
+                                    <form action="{{ route('peminjaman.store') }}" method="POST" class="flex-1">
+                                        @csrf
+                                        <input type="hidden" name="buku_id" value="{{ $book->buku_id }}">
+                                        <input type="hidden" name="tanggal_pinjam" value="{{ date('Y-m-d') }}">
 
-                                <button type="submit"
-                                    class="w-full md:w-auto bg-[#7B96D4] hover:bg-[#5f7bc0] text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
-                                    onclick="return confirm('Konfirmasi peminjaman buku: {{ $book->judul }}?')">
-                                    Pinjam Buku Sekarang
-                                </button>
-                            </form>
-                        @else
-                            <button disabled
-                                class="bg-gray-400 text-white font-semibold py-3 px-8 rounded-lg cursor-not-allowed">
-                                Stok Habis
-                            </button>
-                        @endif
+                                        <button type="submit"
+                                            class="w-full bg-[#7B96D4] hover:bg-[#5f7bc0] text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
+                                            onclick="return confirm('Konfirmasi peminjaman buku: {{ $book->judul }}?')">
+                                            Pinjam Buku
+                                        </button>
+                                    </form>
+                                @else
+                                    <div class="flex-1">
+                                        <button disabled
+                                            class="w-full bg-gray-300 text-gray-500 font-semibold py-3 px-8 rounded-lg cursor-not-allowed border border-gray-200">
+                                            Stok Habis
+                                        </button>
+                                    </div>
+                                @endif
+                            @endguest
+
+
+                            {{-- 2. TOMBOL BACA BUKU DIGITAL --}}
+                            {{-- Cek apakah buku ini punya relasi ke buku_digital --}}
+                            @if ($book->bukuDigital)
+                                @guest
+                                    {{-- JIKA TAMU (BELUM LOGIN) --}}
+                                    <a href="{{ route('login') }}"
+                                        onclick="return confirm('Silakan login terlebih dahulu untuk membaca buku digital.')"
+                                        class="flex-1 text-center text-white font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
+                                        style="background-color: #595959;"> {{-- Warna Abu-abu --}}
+                                        Baca Buku
+                                    </a>
+                                @else
+                                    {{-- JIKA MEMBER (SUDAH LOGIN) --}}
+                                    {{-- Asumsi: Route untuk baca adalah 'digital.show' --}}
+                                    <a href="{{ route('digital.show', $book->bukuDigital->buku_digital_id) }}"
+                                        target="_blank"
+                                        class="flex-1 text-center bg-[#81A2DF] hover:bg-[#5f7bc0] text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-all duration-200 transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                                        {{-- Ikon Buku --}}
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                        </svg>
+                                        Baca Sekarang
+                                    </a>
+                                @endguest
+                            @endif
+
+                        </div>
                     </div>
                 </div>
 

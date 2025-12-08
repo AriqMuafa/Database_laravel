@@ -17,6 +17,9 @@ class Peminjaman extends Model
      *
      * @var array<int, string>
      */
+
+    protected $guarded = [];
+
     protected $fillable = [
         'buku_id',
         'anggota_id',
