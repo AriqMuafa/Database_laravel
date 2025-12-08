@@ -133,9 +133,16 @@ class PeminjamanController extends Controller
         }
     }
 
-    public function create()
+     public function create()
     {
-        return view('borrow_create');
+    
+        $user = Auth::user();
+
+        $anggota = $user->anggota ?? null;
+
+        $buku =Buku::where('stok_buku', '>', 0)->get();
+
+        return view('books.borrow_create', compact('anggota', 'buku'));
     }
 
     public function cetak($id)
