@@ -17,9 +17,9 @@ class ReservasiController extends Controller
      */
     public function index()
     {
-        // Ambil semua reservasi yang masih aktif (Menunggu atau Siap Diambil)
+        // Ambil semua reservasi yang masih aktif (Pending atau Siap Diambil)
         $reservasi = Reservasi::with(['buku', 'anggota'])
-                        ->whereIn('status', ['Menunggu', 'Siap Diambil'])
+                        ->whereIn('status', ['Pending', 'Siap Diambil'])
                         ->orderBy('tanggal_reservasi', 'asc')
                         ->get();
 
@@ -134,7 +134,7 @@ class ReservasiController extends Controller
         // 3. Cek apakah user sudah reservasi buku ini sebelumnya
         $existingReservation = Reservasi::where('buku_id', $buku->buku_id)
                                     ->where('anggota_id', $anggotaId)
-                                    ->whereIn('status', ['Menunggu', 'Siap Diambil'])
+                                    ->whereIn('status', ['Pending', 'Siap Diambil'])
                                     ->exists();
 
         if ($existingReservation) {
@@ -146,7 +146,7 @@ class ReservasiController extends Controller
             'buku_id' => $buku->buku_id,
             'anggota_id' => $anggotaId,
             'tanggal_reservasi' => now(),
-            'status' => 'Menunggu',
+            'status' => 'Pending',
         ]);
 
         // 5. Kembali dengan notifikasi sukses

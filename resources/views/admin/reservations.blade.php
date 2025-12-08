@@ -58,7 +58,7 @@
                                         
                                         {{-- Status --}}
                                         <td class="py-4 px-6">
-                                            @if ($res->status == 'Menunggu')
+                                            @if ($res->status == 'Pending')
                                                 <span class="bg-yellow-100 text-yellow-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded dark:bg-yellow-200 dark:text-yellow-900">
                                                     {{ $res->status }}
                                                 </span>
@@ -72,8 +72,8 @@
                                         {{-- Tombol Opsi --}}
                                         <td class="py-4 px-6 flex flex-col space-y-2">
                                             
-                                            {{-- Skenario 1: Status "Menunggu" --}}
-                                            @if ($res->status == 'Menunggu')
+                                            {{-- Skenario 1: Status "Pending" --}}
+                                            @if ($res->status == 'Pending')
                                                 <form action="{{ route('admin.reservations.siap', $res) }}" method="POST" onsubmit="return confirm('Tandai siap diambil? Stok buku akan dikurangi 1 (ditahan).');">
                                                     @csrf
                                                     <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded text-xs">
