@@ -6,10 +6,13 @@
     --}}
 
     {{-- ======================= BAGIAN 1: TAMPILAN ADMIN ======================= --}}
-    @if (auth()->user()->hasPermission('manage_books') ||
-            auth()->user()->hasPermission('manage_fines') ||
-            auth()->user()->hasPermission('manage_users') ||
-            auth()->user()->hasPermission('manage_reservations'))
+    @if (auth()->check() && (
+        auth()->user()->hasPermission('manage_books') ||
+        auth()->user()->hasPermission('manage_fines') ||
+        auth()->user()->hasPermission('manage_users') ||
+        auth()->user()->hasPermission('manage_reservations')
+    ))
+
 
         <div class="py-12">
             <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
@@ -26,7 +29,7 @@
                             <div class="text-lg font-semibold">Buku</div>
                         </a>
 
-                        @if (auth()->user()->hasPermission('view_members'))
+                        @if (auth()->check() && auth()->user()->hasPermission('view_members'))
                             <a href="{{ route('menu.anggota') }}"
                                 class="group bg-blue-50 dark:bg-gray-700 hover:bg-blue-600 hover:text-white transition-all duration-200 p-6 rounded-xl shadow-sm hover:shadow-lg flex flex-col items-center cursor-pointer">
                                 <div class="text-4xl mb-3">👥</div>
@@ -34,7 +37,7 @@
                             </a>
                         @endif
 
-                        @if (auth()->user()->hasPermission('manage_books'))
+                        @if (auth()->check() && auth()->user()->hasPermission('manage_books'))
                             <a href="{{ route('menu.manajemen') }}"
                                 class="group bg-blue-50 dark:bg-gray-700 hover:bg-blue-600 hover:text-white transition-all duration-200 p-6 rounded-xl shadow-sm hover:shadow-lg flex flex-col items-center cursor-pointer">
                                 <div class="text-4xl mb-3">🛠️</div>
@@ -42,7 +45,7 @@
                             </a>
                         @endif
 
-                        @if (auth()->user()->hasPermission('view_reports'))
+                        @if (auth()->check() && auth()->user()->hasPermission('view_reports'))
                             <a href="{{ route('menu.laporan') }}"
                                 class="group bg-blue-50 dark:bg-gray-700 hover:bg-blue-600 hover:text-white transition-all duration-200 p-6 rounded-xl shadow-sm hover:shadow-lg flex flex-col items-center cursor-pointer">
                                 <div class="text-4xl mb-3">📊</div>
@@ -109,7 +112,7 @@
                     <div class="flex items-center gap-2 mb-4">
                         <img src="{{ asset('img/digilib.svg') }}" alt="Logo" class="h-8 w-8 brightness-0 invert">
                         <span class="text-2xl font-bold text-white">DigiLib</span>
-                    </div>
+                    </div>  
 
                     {{-- Link Footer --}}
                     <div class="flex space-x-6 text-gray-300 text-sm font-medium mb-6">
